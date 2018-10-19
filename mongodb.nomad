@@ -23,7 +23,7 @@ job "mongodb" {
         network {
           mbits = 10
           port  "db"  {
-            static = "27017"
+            
           }
         }
       }
