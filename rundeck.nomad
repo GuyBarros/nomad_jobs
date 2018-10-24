@@ -10,7 +10,7 @@ job "pipelines" {
         image = "phatbrasil/rundeck"
 
         port_map {
-          vaultport = 8200,
+          vaultport = 8200
           http = 4440
         }
       }
@@ -24,18 +24,17 @@ job "pipelines" {
         network {
           mbits = 10
           port  "vaultport"  {
-          
+            
           }
           port  "http"  {
-          
+            
           }
-          
         }
       }
       service {
         name = "rundeck"
         tags = ["global", "rundeck"]
-        port = "db"
+        port = "http",  "vaultport"
 
         check {
           name     = "alive"
@@ -64,3 +63,4 @@ job "pipelines" {
     auto_revert = false
     canary = 0
   }
+}
