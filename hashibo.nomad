@@ -31,7 +31,7 @@ job "presentation" {
       service {
         name = "hashibo"
         tags = ["global", "hashibo"]
-        port = "db"
+        port = "http"
 
         check {
           name     = "alive"
