@@ -20,7 +20,7 @@ job "presentation" {
       }
       resources {
         cpu = 1000
-        mem = 1024
+        memory = 1024
         network {
           mbits = 10
           port  "http"  {

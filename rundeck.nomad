@@ -21,7 +21,7 @@ job "pipelines" {
       }
       resources {
         cpu = 1000
-        mem = 1024
+        memory = 1024
         network {
           mbits = 10
           
