@@ -1,17 +1,16 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
-job "pipelines" {
-  group "ansible" {
+job "presentation" {
+  group "presentation" {
     count = 1
 
-    task "rundeck" {
+    task "hashibo" {
       driver = "docker"
       config {
-        image = "phatbrasil/rundeck"
+        image = "boeroboy/hashibo"
 
         port_map {
-          
-          http = 4440
+          http = 80
         }
       }
 
@@ -24,16 +23,15 @@ job "pipelines" {
         mem = 1024
         network {
           mbits = 10
-          
           port  "http"  {
             
           }
         }
       }
       service {
-        name = "rundeck"
-        tags = ["global", "rundeck"]
-        port = "http"
+        name = "hashibo"
+        tags = ["global", "hashibo"]
+        port = "db"
 
         check {
           name     = "alive"
