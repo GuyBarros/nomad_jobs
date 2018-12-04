@@ -7,6 +7,7 @@ job "nginx" {
 
     vault {
       policies = ["test"]
+       change_mode   = "restart"
     }
 
     task "nginx" {

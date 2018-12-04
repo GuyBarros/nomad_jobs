@@ -3,6 +3,9 @@ job "http-echo-${node_name}" {
 
   group "echo" {
     task "server" {
+      vault {
+      policies = ["test"]
+    }
       driver = "docker"
 
       config {
