@@ -5,10 +5,6 @@ job "nginx" {
   group "nginx" {
     count = 3
 
-    vault {
-      policies = ["test"]
-    }
-
     task "nginx" {
       driver = "docker"
 
@@ -43,9 +39,8 @@ job "nginx" {
       template {
         data = <<EOH
 	  Good morning.
-	  {{ with secret "secret/test" }}
-	  secret: {{ .Data.message }}
-      {{ end }}
+	 
+
       EOH
 
         destination = "local/data/nginx-secret/index.html"
