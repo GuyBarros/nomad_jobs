@@ -43,10 +43,13 @@ job "nginx" {
       # vault write secret/motd ttl=10s message='Live demos rock!!!'
       template {
         data = <<EOH
-	  Good morning.
+	  from ${NOMAD_ADDR_http}
+    
 	  {{ with secret "secret/test" }}
 	  secret: {{ .Data.message }}
       {{ end }}
+
+     
       EOH
 
         destination = "local/data/nginx-secret/index.html"

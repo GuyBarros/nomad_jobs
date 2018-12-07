@@ -24,13 +24,13 @@ job "jenkins" {
       env {
         # Use ephemeral storage for Jenkins data.
         JENKINS_HOME = "/alloc/data"
-        JENKINS_SLAVE_AGENT_PORT = 5050
+        JENKINS_SLAVE_AGENT_PORT = "${NOMAD_PORT_slave}"
       }
       driver = "java"
       config {
         jar_path    = "local/jenkins.war"
         jvm_options = ["-Xmx768m", "-Xms384m"]
-        args        = ["--httpPort=8080"]
+        args        = ["--httpPort=${NOMAD_PORT_http}"]
       }
       artifact {
         source = "http://ftp-chi.osuosl.org/pub/jenkins/war-stable/2.89.1/jenkins.war"
@@ -60,10 +60,10 @@ job "jenkins" {
           network {
             mbits = 100
             port "http" {
-                static = 8080
+                
             }
             port "slave" {
-              static = 5050
+              
             }
           }
         }
