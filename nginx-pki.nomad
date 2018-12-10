@@ -2,7 +2,7 @@ job "nginx" {
   datacenters = ["dc1"]
   type = "service"
 
-  group "vaultIntegration" {
+  group "nginx-vault-integraton" {
     count = 3
 
     vault {
@@ -63,12 +63,17 @@ job "nginx" {
             Hello From {{ env "node.unique.name"	 }}
             <br />
             <br />
-{{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=30m" }}
-{{ .Data.certificate }}
+            <br />
+	          {{ with secret "secret/test" }}
+	          KV Secret from Vault: {{ .Data.message }}
             <br />
             <br />
-{{ .Data.private_key }}
-{{ end }}
+            {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=30m" }}
+            {{ .Data.certificate }}
+            <br />
+            <br />
+            {{ .Data.private_key }}
+            {{ end }}
         EOH
 
         destination = "local/data/nginx-pki/index.html"
