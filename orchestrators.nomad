@@ -37,7 +37,7 @@ job "pipelines" {
       }
       service {
         name = "rundeck"
-        tags = ["global", "rundeck"]
+        tags = ["global", "urlprefix-/rundeck"]
         port = "http"
 
         check {

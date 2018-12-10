@@ -29,7 +29,7 @@ job "mongodb" {
       }
       service {
         name = "mongodb"
-        tags = ["global", "mongodb"]
+        tags = ["global", "mongodb","urlprefix-/mongodb"]
         port = "db"
 
         check {
