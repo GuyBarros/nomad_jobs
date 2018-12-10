@@ -89,7 +89,7 @@ job "nginx" {
       }
 
       service {
-        name = "nginx-pki"
+        name = "nginx"
         port = "https"
         check {
           type     = "tcp"
