@@ -90,7 +90,7 @@ job "nginx" {
 
       service {
         name = "nginx-pki"
-        port = "https"
+        port = "http"
         tags = [
           "global",
           "urlprefix-/nginx-pki"
