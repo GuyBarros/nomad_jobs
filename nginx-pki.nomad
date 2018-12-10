@@ -80,18 +80,17 @@ job "nginx" {
         network {
           mbits = 10
           port "http" {
-            static = 80
+            
           }
           port "https" {
-            static = 443
+            
           }
         }
       }
 
       service {
         name = "nginx-pki"
-        tags = ["frontend","urlprefix-/nginx strip=/nginx"]
-        port = "http"
+        port = "https"
         check {
           type     = "tcp"
           interval = "10s"
