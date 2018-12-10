@@ -60,7 +60,7 @@ job "nginx" {
 
       template {
         data = <<EOH
-            Hello From {{ env node.unique.name	 }}
+            Hello From {{ env "node.unique.name"	 }}
             <br />
             <br />
 {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=30m" }}
@@ -135,7 +135,7 @@ job "nginx" {
       # vault write secret/motd ttl=10s message='Live demos rock!!!'
       template {
         data = <<EOH
-	   from {{ env node.unique.name }}
+	   from {{ env "node.unique.name" }}
     <br />
     <br />
 	  {{ with secret "secret/test" }}
