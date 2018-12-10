@@ -61,7 +61,7 @@ job "nginx" {
       }
 
       service {
-        name = "nginx"
+        name = "nginx-secret"
         tags = [
           "global",
           "urlprefix-/nginx-secret"
