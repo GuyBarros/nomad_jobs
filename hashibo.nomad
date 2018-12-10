@@ -2,7 +2,7 @@
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "presentation" {
   group "presentation" {
-    count = 1
+    count = 3
 
     task "hashibo" {
       driver = "docker"

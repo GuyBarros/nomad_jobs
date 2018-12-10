@@ -38,8 +38,8 @@ job "nginx" {
             ssl_certificate /etc/nginx/ssl/nginx.key;
             ssl_certificate_key /etc/nginx/ssl/nginx.key;
 
-            location / {
-              root /local/data/;
+            location /nginx-pki {
+              root /local/data;
             }
           }
         EOH
@@ -71,7 +71,7 @@ job "nginx" {
 {{ end }}
         EOH
 
-        destination = "local/data/index.html"
+        destination = "local/data/nginx-pki/index.html"
       }
 
       resources {
@@ -102,6 +102,7 @@ job "nginx" {
         }
       }
     }
+
     task "nginx-secret" {
       driver = "docker"
 
