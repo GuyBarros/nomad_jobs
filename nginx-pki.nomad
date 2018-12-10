@@ -2,7 +2,7 @@ job "nginx" {
   datacenters = ["dc1"]
   type = "service"
 
-  group "nginx" {
+  group "vaultIntegration" {
     count = 3
 
     vault {
@@ -29,7 +29,7 @@ job "nginx" {
       template {
         data = <<EOH
           server {
-            listen 8080;
+            listen 80;
             listen 443 ssl;
 
             server_name nginx.service.consul;
@@ -102,7 +102,7 @@ job "nginx" {
         }
       }
     }
-    task "nginx" {
+    task "nginx-secret" {
       driver = "docker"
 
       config {
@@ -135,7 +135,11 @@ job "nginx" {
       # vault write secret/motd ttl=10s message='Live demos rock!!!'
       template {
         data = <<EOH
-	  Good morning.
+	   from ${node.unique.name}
+    
+	  {{ with secret "secret/test" }}
+	  secret: {{ .Data.message }}
+      {{ end }}
 	 
 
       EOH
