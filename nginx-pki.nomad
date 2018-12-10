@@ -29,7 +29,7 @@ job "nginx" {
       template {
         data = <<EOH
           server {
-
+            listen 8080;
             listen 443 ssl;
 
             server_name nginx.service.consul;
@@ -60,7 +60,7 @@ job "nginx" {
 
       template {
         data = <<EOH
-            Good morning.
+            Hello From ${node.unique.name}	
             <br />
             <br />
 {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=30m" }}
@@ -91,6 +91,10 @@ job "nginx" {
       service {
         name = "nginx"
         port = "https"
+        tags = [
+          "global",
+          "urlprefix-/nginx-pki"
+          ]
         check {
           type     = "tcp"
           interval = "10s"
