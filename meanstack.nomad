@@ -9,9 +9,9 @@ job "meanstack" {
       config {
         image = "phatbrasil/meanstack_backend"
 args = [
-    "--env", "MONGODB_URL",
+    "--env", "MONGODB_URL=",
     "mongodb.service.consul",
-    "--env", "MONGODB_PORT",
+    "--env", "MONGODB_PORT=",
     "27017",
   ]
         port_map {
@@ -34,8 +34,8 @@ args = [
         }
       }
       service {
-        name = "meanstack_backend"
-        tags = ["urlprefix-/meanstack_backend strip=/meanstack_backend"]
+        name = "backend"
+        tags = ["urlprefix-/backend strip=/backend"]
         port = "http"
 
         check {
