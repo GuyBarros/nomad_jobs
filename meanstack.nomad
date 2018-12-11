@@ -1,16 +1,21 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
-job "mongodb" {
-  group "mongodb" {
-    count = 1
+job "meanstack" {
+  group "nodejs" {
+    count = 3
 
-    task "mongodb" {
+    task "backend" {
       driver = "docker"
       config {
-        image = "mongo"
-
+        image = "phatbrasil/meanstack_backend"
+args = [
+    "--env", "MONGODB_URL",
+    "mongodb.service.consul",
+    "--env", "MONGODB_PORT",
+    "27017",
+  ]
         port_map {
-          db = 27017
+          http = 5000
         }
       }
 
@@ -19,18 +24,19 @@ job "mongodb" {
         max_file_size = 15
       }
       resources {
-        
+        cpu = 1000
+        memory = 1024
         network {
           mbits = 10
-          port  "db"  {
-            static = 27017
+          port  "http"  {
+            
           }
         }
       }
       service {
-        name = "mongodb"
-        tags = ["global", "mongodb","urlprefix-/mongodb"]
-        port = "db"
+        name = "meanstack_backend"
+        tags = ["urlprefix-/meanstack_backend strip=/meanstack_backend"]
+        port = "http"
 
         check {
           name     = "alive"

@@ -7,7 +7,7 @@ job "presentation" {
     task "hashibo" {
       driver = "docker"
       config {
-        image = "boeroboy/hashibo"
+        image = "boeroboy/hashiconf:2018"
 
         port_map {
           http = 80
