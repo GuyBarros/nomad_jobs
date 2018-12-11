@@ -3,17 +3,17 @@ job "nginx" {
   type = "service"
 
   group "vaultIntegration" {
-    count = 3
+    count = 1
 
-    
+    vault {
+      policies = ["superuser"]
+    }
 
     task "nginx-pki" {
       driver = "docker"
 
-vault {
-      policies = ["superuser"]
-    }
-    
+
+
       config {
         image = "nginx"
         port_map {
@@ -62,13 +62,14 @@ vault {
 
       template {
         data = <<EOH
-            Hello From {{ env "node.unique.name"	 }}
-            <br />
-	          {{ with secret "secret/test" }}
-	          Static Secret: {{ .Data.message }}
-            {{ end }}
+             from {{ env "node.unique.name" }}
             <br />
             <br />
+            {{ with secret "secret/test" }}
+            secret: {{ .Data.message }}
+              {{ end }}
+            <br />
+	          <br />
             {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=30m" }}
             {{ .Data.certificate }}
             <br />
@@ -98,9 +99,75 @@ vault {
         name = "nginx-pki"
         port = "http"
         tags = [
-          "global",
           "urlprefix-/nginx-pki"
           ]
+        check {
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+    }
+
+
+    task "nginx-secret" {
+      driver = "docker"
+       config {
+        image = "nginx"
+        port_map {
+          http = 8080
+        }
+        port_map {
+          https = 443
+        }
+        volumes = [
+          "custom/default.conf:/etc/nginx/conf.d/default.conf"
+        ]
+      }
+       template {
+        data = <<EOH
+          server {
+            listen 8080;
+            server_name nginx.service.consul;
+            location /nginx-secret {
+              root /local/data;
+            }
+          }
+        EOH
+         destination = "custom/default.conf"
+      }
+       template {
+        data = <<EOH
+	   from {{ env "node.unique.name" }}
+    <br />
+    <br />
+	  {{ with secret "secret/test" }}
+	  secret: {{ .Data.message }}
+      {{ end }}
+	 
+       EOH
+         destination = "local/data/nginx-secret/index.html"
+      }
+       resources {
+        cpu    = 100 # 100 MHz
+        memory = 128 # 128 MB
+        network {
+          mbits = 10
+          port "http" {
+              
+          }
+          port "https" {
+            
+          }
+        }
+      }
+       service {
+        name = "nginx-secret"
+        tags = [
+          "global",
+          "urlprefix-/nginx-secret"
+          ]
+        port = "http"
         check {
           type     = "tcp"
           interval = "10s"
