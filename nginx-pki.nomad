@@ -2,7 +2,7 @@ job "nginx" {
   datacenters = ["dc1"]
   type = "service"
 
-  group "vaultIntegration" {
+  group "withvault" {
     count = 1
 
     vault {
@@ -11,8 +11,6 @@ job "nginx" {
 
     task "nginx-pki" {
       driver = "docker"
-
-
 
       config {
         image = "nginx"
@@ -99,6 +97,7 @@ job "nginx" {
         name = "nginx-pki"
         port = "http"
         tags = [
+          "global",
           "urlprefix-/nginx-pki"
           ]
         check {
@@ -146,6 +145,7 @@ job "nginx" {
       {{ end }}
 	 
        EOH
+
          destination = "local/data/nginx-secret/index.html"
       }
        resources {
