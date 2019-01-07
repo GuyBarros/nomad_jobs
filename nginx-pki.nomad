@@ -3,7 +3,7 @@ job "nginx" {
   type = "service"
 
   group "withvault" {
-    count = 1
+    count = 5
 
     vault {
       policies = ["superuser"]
