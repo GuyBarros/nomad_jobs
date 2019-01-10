@@ -30,7 +30,7 @@ job "presentation" {
       }
       service {
         name = "hashibo"
-        tags = ["urlprefix-/#/"]
+        tags = ["urlprefix-/hashibo strip=/hashibo"]
         port = "http"
 
         check {
