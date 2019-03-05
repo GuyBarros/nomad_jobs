@@ -1,6 +1,11 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "mongodb" {
+
+  datacenters = ["aws","azure"]
+  type = "service"
+
+  
   group "mongodb" {
     count = 1
 
@@ -49,8 +54,6 @@ job "mongodb" {
 
   }
 
-  datacenters = ["dc1"]
-  type = "service"
 
   update {
     max_parallel = 1

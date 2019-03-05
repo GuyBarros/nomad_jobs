@@ -1,6 +1,10 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "pipelines" {
+  datacenters = ["aws","azure"]
+  type = "service"
+
+  
   group "ansible" {
     count = 1
 
@@ -57,8 +61,7 @@ job "pipelines" {
 
   }
 
-  datacenters = ["dc1"]
-  type = "service"
+   
 
   update {
     max_parallel = 1

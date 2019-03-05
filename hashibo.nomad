@@ -1,6 +1,9 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "presentation" {
+  datacenters = ["aws","azure"]
+  type = "service"
+
   group "presentation" {
     count = 3
 
@@ -50,9 +53,8 @@ job "presentation" {
 
   }
 
-  datacenters = ["dc1"]
-  type = "service"
-
+  
+  
   update {
     max_parallel = 1
     min_healthy_time = "5s"

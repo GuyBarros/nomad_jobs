@@ -1,5 +1,5 @@
 job "http-echo-${node_name}" {
-  datacenters = ["dc1"]
+  datacenters = ["aws","azure"]
 
   group "echo" {
     task "server" {

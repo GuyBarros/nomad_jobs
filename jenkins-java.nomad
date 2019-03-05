@@ -1,6 +1,6 @@
 job "jenkins" {
   type = "service"
-    datacenters = ["dc1"]
+   datacenters = ["aws","azure"]
     update {
       stagger      = "30s"
         max_parallel = 1
