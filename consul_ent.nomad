@@ -22,8 +22,7 @@ job "hashicorp" {
         max_file_size = 35
       }
       resources {
-          cpu = 1000
-        memory = 1024
+          
         network {
           port  "http"  {
             static = 8500
