@@ -63,7 +63,7 @@ job "nginx" {
              from {{ env "node.unique.name" }}
             <br />
             <br />
-            {{ with secret "secret/test" }}
+            {{ with secret "kv/test" }}
             secret: {{ .Data.message }}
               {{ end }}
             <br />
