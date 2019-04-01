@@ -1,7 +1,7 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "meanstack" {
-  datacenters = ["aws","azure"]
+  datacenters = ["aws","ukwest"]
   type = "service"
   
   group "nodejs" {

@@ -2,7 +2,7 @@
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "mongodb" {
 
-  datacenters = ["aws","azure"]
+  datacenters = ["aws","ukwest"]
   type = "service"
 
   

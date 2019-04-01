@@ -1,6 +1,6 @@
 job "hashi-ui" {
   region      = "global"
-  datacenters = ["aws","azure"]
+  datacenters = ["aws","ukwest"]
   type        = "service"
 
   group "server" {
