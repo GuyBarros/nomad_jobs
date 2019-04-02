@@ -1,5 +1,5 @@
 job "nginx" {
-   datacenters = ["aws","ukwest"]
+   datacenters = ["eu-west-2","ukwest"]
   type = "service"
 
   group "withvault" {

@@ -1,7 +1,7 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "pipelines" {
-  datacenters = ["aws","ukwest"]
+  datacenters = ["eu-west-2","ukwest"]
   type = "service"
 
   

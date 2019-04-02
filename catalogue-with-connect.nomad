@@ -1,5 +1,5 @@
 job "catalogue-with-connect" {
-  datacenters = ["aws","ukwest"]
+  datacenters = ["eu-west-2","ukwest"]
 
   constraint {
     attribute = "${attr.kernel.name}"

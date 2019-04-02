@@ -18,7 +18,7 @@ job "example" {
 
   # The "datacenters" parameter specifies the list of datacenters which should
   # be considered when placing this task. This must be provided.
-  datacenters = ["aws","ukwest"]
+  datacenters = ["eu-west-2","ukwest"]
 
   # The "type" parameter controls the type of job, which impacts the scheduler's
   # decision on placement. This configuration is optional and defaults to
