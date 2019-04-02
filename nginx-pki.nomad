@@ -63,9 +63,7 @@ job "nginx" {
              from {{ env "node.unique.name" }}
             <br />
             <br />
-            {{ with secret "kv/test" }}
-            secret: {{ .Data.message }}
-              {{ end }}
+           
             <br />
 	          <br />
             {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=30m" }}
