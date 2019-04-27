@@ -60,6 +60,10 @@ job "nginx" {
 
       template {
         data = <<EOH
+            <h2> Hello World </h2>
+            <br />
+            <br />
+           
              from {{ env "node.unique.name" }}
             <br />
             <br />
