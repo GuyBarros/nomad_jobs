@@ -1,7 +1,7 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "tfe-integration" {
-  datacenters = ["ukwest"]
+  datacenters = ["ukwest","eu-west-2","dc1"]
   type = "service"
 
   group "terraform-jenkins" {
