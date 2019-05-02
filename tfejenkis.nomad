@@ -10,7 +10,7 @@ job "tfe-integration" {
     task "jenkins" {
       driver = "docker"
       config {
-        image = "phatbrasil/tfejenkins:version2"
+        image = "andrefcpimentel/jenkins-vault:latest"
 
         port_map {
           http = 8080
