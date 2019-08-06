@@ -1,7 +1,7 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "hashicorp" {
-  datacenters = ["dc1","eu-west-2","ukwest"]
+  datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1"]
   type = "service"
 
   group "consul" {

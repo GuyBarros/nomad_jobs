@@ -1,5 +1,5 @@
 job "http-echo-${node_name}" {
-  datacenters = ["eu-west-2","ukwest"]
+  datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1"]
 
   group "echo" {
     task "server" {

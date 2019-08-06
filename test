@@ -1,5 +1,0 @@
-                     credentials "Russ" {
-                        token        = "12345"
-                     }
-                     EOF
-
