@@ -70,7 +70,7 @@ job "nginx" {
            
             <br />
 	          <br />
-            {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=30m" }}
+            {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=90m" }}
             {{ .Data.certificate }}
             <br />
             <br />
