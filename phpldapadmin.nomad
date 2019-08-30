@@ -36,7 +36,7 @@ logs {
       }
       service {
         name = "phpldapadmin-server"
-        tags = ["urlprefix-/phpldapadmin-server strip=/phpldapadmin-server"]
+        tags = ["urlprefix-/phpldapadmin-server strip=/phpldapadmin-server  proto=https tlsskipverify=true"]
         port = "https"
 
         check {
