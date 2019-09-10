@@ -1,5 +1,6 @@
-# For full documentation and examples, see
-#     https://www.nomadproject.io/docs/job-specification/job.html
+#vault secrets enable database
+# vault write database/config/my-mongodb-database plugin_name=mongodb-database-plugin allowed_roles="my-role" connection_url="mongodb://{{username}}:{{password}}@mongodb.service.consul:27017/admin?ssl=true" username="root"  password="rootpassword"
+# vault write database/roles/my-role db_name=my-mongodb-database creation_statements='{ "db": "admin", "roles": [{ "role": "readWrite" }, {"role": "read", "db": "foo"}] }' default_ttl="1h" max_ttl="24h"
 job "mongodb" {
 
   datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1"]
@@ -17,6 +18,11 @@ job "mongodb" {
         port_map {
           db = 27017
         }
+      }
+      
+      env {
+          MONGO_INITDB_ROOT_USERNAME="root",
+      MONGO_INITDB_ROOT_PASSWORD="rootpassword"
       }
 
       logs {
