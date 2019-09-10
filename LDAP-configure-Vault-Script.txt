@@ -1,0 +1,20 @@
+login to: http://fabio.eu-guystack.hashidemos.io:9999/phpldapadmin-server/
+user: cn=admin,dc=example,dc=org
+password: admin
+go to import and import your LDIF file
+
+CONFIGURE VAULT:
+
+vault auth enable ldap
+
+vault write auth/ldap/config \
+    url="ldap://ldap-service.service.consul" \
+    binddn="cn=admin,dc=example,dc=org" \
+    userattr="uid" \
+    bindpass='admin' \
+    userdn="ou=Users,dc=example,dc=org" \
+    groupdn="ou=Groups,dc=example,dc=org" \
+    insecure_tls=true
+
+    vault write auth/ldap/groups/admins policies=superuser
+    vault write auth/ldap/groups/dev policies=test

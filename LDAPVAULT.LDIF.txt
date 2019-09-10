@@ -1,0 +1,51 @@
+################
+# Entry 3: ou=Groups,dc=example,dc=org
+dn: ou=Groups,dc=example,dc=org
+objectclass: organizationalUnit
+objectclass: top
+ou: Groups
+# Entry 4: cn=admins,ou=Groups,dc=example,dc=org
+dn: cn=admins,ou=Groups,dc=example,dc=org
+cn: admins
+gidnumber: 501
+memberuid: jlynch
+objectclass: posixGroup
+objectclass: top
+# Entry 5: cn=dev,ou=Groups,dc=example,dc=org
+dn: cn=dev,ou=Groups,dc=example,dc=org
+cn: dev
+gidnumber: 500
+memberuid: juser
+objectclass: posixGroup
+objectclass: top
+# Entry 6: ou=Users,dc=example,dc=org
+dn: ou=Users,dc=example,dc=org
+objectclass: organizationalUnit
+objectclass: top
+ou: Users
+# Entry 7: cn=Jane Lynch,ou=Users,dc=example,dc=org
+dn: cn=Jane Lynch,ou=Users,dc=example,dc=org
+cn: Jane Lynch
+gidnumber: 501
+givenname: Jane
+homedirectory: /home/users/jlynch
+objectclass: inetOrgPerson
+objectclass: posixAccount
+objectclass: top
+sn: Lynch
+uid: jlynch
+uidnumber: 1001
+userpassword: password
+# Entry 8: cn=Joe User,ou=Users,dc=example,dc=org
+dn: cn=Joe User,ou=Users,dc=example,dc=org
+cn: Joe User
+gidnumber: 500
+givenname: Joe
+homedirectory: /home/users/juser
+objectclass: inetOrgPerson
+objectclass: posixAccount
+objectclass: top
+sn: User
+uid: juser
+uidnumber: 1000
+userpassword: password 
