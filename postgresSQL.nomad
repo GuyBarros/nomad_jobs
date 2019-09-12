@@ -3,9 +3,8 @@
 # vault write database/config/postgresql  plugin_name=postgresql-database-plugin   connection_url="postgresql://{{username}}:{{password}}@postgres.service.consul:5432/postgres?sslmode=disable"   allowed_roles="*"     username="root"     password="rootpassword"
 # vault write database/roles/readonly db_name=postgresql     creation_statements=@readonly.sql     default_ttl=1h max_ttl=24h
 
-
 job "postgres" {
-  datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1"]
+  datacenters = ["eu-west-2","eu-west-1","ukwest","sa-east-1","ap-northeast-1","dc1"]
   type = "service"
 
   group "postgres" {
@@ -18,19 +17,19 @@ job "postgres" {
         network_mode = "host"
         port_map {
           db = 5432
-        }    
-        
+        }
+
       }
       env {
           POSTGRES_USER="root",
           POSTGRES_PASSWORD="rootpassword"
       }
 
-logs {
+      logs {
         max_files     = 5
         max_file_size = 15
       }
-      
+
       resources {
         cpu = 1000
         memory = 1024
@@ -63,8 +62,6 @@ logs {
 
   }
 
-  
-  
   update {
     max_parallel = 1
     min_healthy_time = "5s"
