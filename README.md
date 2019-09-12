@@ -39,7 +39,7 @@ Declare the following in your `runjobs.tf`, where `nomad_node` is your nomad nod
 
 ``` javascript
 data "template_file" "vault-ssh-helper" {
-  template = "${file("./vault-ssh-helper.nomad")}"
+  template = "${file("./vault-ssh-helper.nomad.tpl")}"
   vars = {
     nomad_node = "ric-lnd-stack-server-1"
   }

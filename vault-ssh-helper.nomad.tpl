@@ -51,10 +51,12 @@ sudo chown root:root /usr/local/bin/vault-ssh-helper
 # Configuring the agent
 sudo mkdir -p /etc/vault-ssh-helper.d/
 
+openssl s_client -showcerts -connect vault.service.consul:8200 </dev/null 2>/dev/null|openssl x509 -outform PEM > /etc/vault-ssh-helper.d/vault.crt
+
 cat << EOF > /etc/vault-ssh-helper.d/config.hcl
 vault_addr = "https://vault.service.consul:8200"
 ssh_mount_point = "ssh"
-ca_cert = "/etc/vault.d/tls/vault.crt"
+ca_cert = "/etc/vault-ssh-helper.d/vault.crt"
 tls_skip_verify = true
 allowed_roles = "*"
 allowed_cidr_list = "0.0.0.0/0"
@@ -74,8 +76,8 @@ sudo sed -i "/^PasswordAuthentication yes/c\PasswordAuthentication no" /etc/ssh/
 sudo systemctl restart sshd
 
 # remove your authorised_keys, if any.
-if [ -f ~/.ssh/authorized_keys ]; then
-  mv ~/.ssh/authorized_keys ~/.ssh/backup
+if [ -f /home/ubuntu/.ssh/authorized_keys ]; then
+  mv /home/ubuntu/.ssh/authorized_keys /home/ubuntu/.ssh/backup
 fi
 
 EOH
