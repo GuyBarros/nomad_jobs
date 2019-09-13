@@ -80,6 +80,10 @@ if [ -f /home/ubuntu/.ssh/authorized_keys ]; then
   mv /home/ubuntu/.ssh/authorized_keys /home/ubuntu/.ssh/backup
 fi
 
+# Uncomment the line below if you run into issues
+# mv /home/ubuntu/.ssh/backup /home/ubuntu/.ssh/authorized_keys
+
+
 EOH
 
       destination = "script.sh"
