@@ -16,5 +16,5 @@ vault write auth/ldap/config \
     groupdn="ou=Groups,dc=example,dc=org" \
     insecure_tls=true
 
-    vault write auth/ldap/groups/admins policies=superuser
-    vault write auth/ldap/groups/dev policies=test
+    vault write auth/ldap/groups/approvers policies=superuser
+    vault write auth/ldap/groups/requesters policies=test
