@@ -4,7 +4,7 @@
 * login to: http://fabio.eu-guystack.hashidemos.io:9999/phpldapadmin-server/
 * user: cn=admin,dc=example,dc=org
 password: admin
-* Go to import and import your LDIF file [LDAPVAULT.LDIF](LDAPVAULT.LDIF)
+* Go to import and import your LDIF file [LDAPVAULT.LDIF](LDAPVAULT.LDIF) (don't stop on errors)
 
 ## CONFIGURE VAULT
 

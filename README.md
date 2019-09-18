@@ -116,38 +116,6 @@ resource "nomad_job" "phpldapadmin" {
 }
 ```
 
-Optionally, you can login via `fabio` on `http://fabio.<demo stack namespace>.hashidemos.io:9999/phpldapadmin-server/` as `cn=admin,dc=example,dc=org` and import the `LDAPVAULT.LDIF` file (don't stop on errors)
+Optionally, you can login via `fabio` on `http://fabio.<demo stack namespace>.hashidemos.io:9999/phpldapadmin-server/` as `cn=admin,dc=example,dc=org` and import the [LDAPVAULT.LDIF](LDAPVAULT.LDIF) file (don't stop on errors)
 
-Here's an example on how to configure vault for the control groups demo.
-
-``` bash
-vault auth enable ldap
-
-vault write auth/ldap/config \
-    url="ldap://ldap-service.service.consul" \
-    binddn="cn=admin,dc=example,dc=org" \
-    userattr="uid" \
-    bindpass='admin' \
-    userdn="ou=Users,dc=example,dc=org" \
-    groupdn="ou=Groups,dc=example,dc=org" \
-    insecure_tls=true
-
-vault write identity/group name="approvers" \
-      policies="superuser" \
-      type="external"
-
-vault read identity/group/name/approvers  -format=json | jq -r .data.id > approvers_group_id.txt
-vault auth list -format=json  | jq -r '.["ldap/"].accessor' > accessor.txt
-
-vault write identity/group-alias name="approvers" \
-        mount_accessor=$(cat accessor.txt) \
-        canonical_id=$(cat approvers_group_id.txt)
-
-
-vault kv put kv/cgtest example=value
-```
-
-And here's how one would login
-``` bash
-vault login -method=ldap username='andre'
-```
+To configure vault for the control groups demo, see [LDAP-configure-Vault-Script](LDAP-configure-Vault-Script.md)
