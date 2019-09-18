@@ -1,6 +1,8 @@
 # nomad_jobs
 A collection of Nomad Jobds to run as part of the meanstack-consul-connect demo
 
+These are tightly coupled with the nomad created in the repo `terraform-aws-demostack`
+
 ***These should NOT be used as examples of a production deployment.***
 
 ## List demos
@@ -99,4 +101,53 @@ ssh-keygen -Lf  signed-cert.pub
 
 # Then just sign in (replacing your server hostname)
 ssh -i signed-cert.pub -i ~/.ssh/id_rsa ubuntu@<nomad_node_ip/hostname>
+```
+
+### LDAP demo
+
+Declare the following in your `runjobs.tf`,
+
+``` javascript
+resource "nomad_job" "ldap-server" {
+  jobspec = "${file("./ldap-server.nomad")}"
+}
+resource "nomad_job" "phpldapadmin" {
+  jobspec = "${file("./phpldapadmin.nomad")}"
+}
+```
+
+Optionally, you can login via `fabio` on `http://fabio.<demo stack namespace>.hashidemos.io:9999/phpldapadmin-server/` as `cn=admin,dc=example,dc=org` and import the `LDAPVAULT.LDIF` file (don't stop on errors)
+
+Here's an example on how to configure vault for the control groups demo.
+
+``` bash
+vault auth enable ldap
+
+vault write auth/ldap/config \
+    url="ldap://ldap-service.service.consul" \
+    binddn="cn=admin,dc=example,dc=org" \
+    userattr="uid" \
+    bindpass='admin' \
+    userdn="ou=Users,dc=example,dc=org" \
+    groupdn="ou=Groups,dc=example,dc=org" \
+    insecure_tls=true
+
+vault write identity/group name="approvers" \
+      policies="superuser" \
+      type="external"
+
+vault read identity/group/name/approvers  -format=json | jq -r .data.id > approvers_group_id.txt
+vault auth list -format=json  | jq -r '.["ldap/"].accessor' > accessor.txt
+
+vault write identity/group-alias name="approvers" \
+        mount_accessor=$(cat accessor.txt) \
+        canonical_id=$(cat approvers_group_id.txt)
+
+
+vault kv put kv/cgtest example=value
+```
+
+And here's how one would login
+``` bash
+vault login -method=ldap username='andre'
 ```
