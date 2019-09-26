@@ -1,44 +1,82 @@
 job "monitoring" {
   datacenters = ["eu-west-1","eu-west-2","eu-west-3","ukwest","sa-east-1","ap-northeast-1","dc1"]
-   type = "service"
+    type = "service"
     group "prometheus-grafana" {
         count = 1
+        ephemeral_disk {
+        size = 300
+        }
 
         restart {
             attempts = 0
             mode     = "fail"
          }
 
-            volume "prometheus_vol" {
-                type = "host"
+        volume "prometheus_vol" {
+            type = "host"
 
-                config {
-                    source = "prometheus_mount"
-                }
-            }
+        config {
+            source = "prometheus_mount"
+        }
+        }
 
         task "prometheus" {
+            template {
+                change_mode = "noop"
+                destination = "local/prometheus.yml"
+                data = <<EOH
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+scrape_configs:
+  - job_name: 'nomad_metrics'
+
+    consul_sd_configs:
+    - server: '{{ env "NOMAD_IP_prometheus_ui" }}:8500'
+      services: ['nomad-client', 'nomad']
+
+    relabel_configs:
+    - source_labels: ['__meta_consul_tags']
+      regex: '(.*)http(.*)'
+      action: keep
+
+    scrape_interval: 5s
+    metrics_path: /v1/metrics
+    params:
+      format: ['prometheus']
+
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['localhost:9090']
+
+  - job_name: 'vault'
+    metrics_path: "/v1/sys/metrics"
+    params:
+      format: ['prometheus']
+    bearer_token: your_vault_token_here
+    static_configs:
+    - targets: ['active.vault.service.consul:8200']
+EOH
+            }
             driver = "docker"
-            env { }
-            artifact {
-                source = "https://raw.githubusercontent.com/GuyBarros/nomad_jobs/master/prometheus/prometheus.yml"
-                destination = "/tmp/prometheus.yml"
-            }
-            volume_mount {
-                volume      = "prometheus_vol"
-                destination = "/prometheus-data/"
-            }
+            # artifact {
+            #     source = "https://raw.githubusercontent.com/GuyBarros/nomad_jobs/master/prometheus/prometheus.yml"
+            #     destination = "/opt/prometheus/config"
+            # }
             # docker run -p 9090:9090 -v /tmp/prometheus.yml:/etc/prometheus/prometheus.yml \prom/prometheus
             config {
                 image = "prom/prometheus"
                 network_mode = "host"
                 args = [
+                    "--web.external-url=http://fabio.ric-lnd-stack.hashidemos.io:9999/prometheus",
+                    "--web.route-prefix=/",
                     "--config.file=/etc/prometheus/prometheus.yml",
                     "--storage.tsdb.retention.size=150GB",
+                #     # "--storage.tsdb.path=/opt/prometheus/data/"
                 ]
 
                 volumes = [
-                     "/tmp/prometheus.yml:/etc/prometheus/prometheus.yml"
+                    "local/prometheus.yml:/etc/prometheus/prometheus.yml"
                 ]
 
                 port_map {
@@ -62,22 +100,25 @@ job "monitoring" {
             }
             service {
                 name = "prometheus"
-                tags = ["urlprefix-/prometheus strip=/prometheus"]
+                tags = ["urlprefix-/prometheus  strip=/prometheus"]
                 port = "prometheus"
                 check {
-                    type = "tcp"
+                    name     = "prometheus port alive"
+                    type     = "http"
+                    path     = "/-/healthy"
                     interval = "10s"
-                    timeout = "4s"
+                    timeout  = "2s"
                 }
             }
         }
 
 
 
-    task "grafana" {
+        task "grafana" {
             driver = "docker"
             env {
-
+                "GF_SERVER_DOMAIN"="fabio.ric-lnd-stack.hashidemos.io"
+                "GF_SERVER_ROOT_URL"="%(protocol)s://%(domain)s/grafana/"
             }
             config {
                 image = "grafana/grafana"
