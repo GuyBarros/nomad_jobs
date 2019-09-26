@@ -51,9 +51,12 @@ scrape_configs:
 
   - job_name: 'vault'
     metrics_path: "/v1/sys/metrics"
+    scheme: "https"
+    tls_config:
+        insecure_skip_verify: true
     params:
       format: ['prometheus']
-    bearer_token: your_vault_token_here
+    bearer_token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     static_configs:
     - targets: ['active.vault.service.consul:8200']
 EOH
