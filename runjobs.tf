@@ -18,14 +18,15 @@ data "terraform_remote_state" "demostack" {
 
 
 # Register a job
-resource "nomad_job" "nginx-pki" {
-  jobspec = "${file("./nginx-pki.nomad")}"
+data "template_file" "vault-ssh-helper" {
+  template = "${file("./vault-ssh-helper.nomad.tpl")}"
+  vars = {
+    nomad_node = "EU-guystack-worker-1"
+  }
 }
 
-resource "nomad_job" "hashibo" {
-  jobspec = "${file("./hashibo.nomad")}"
+resource "nomad_job" "vault-ssh-helper" {
+  jobspec = "${data.template_file.vault-ssh-helper.rendered}"
 }
-
-
 
 
