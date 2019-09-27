@@ -21,6 +21,7 @@ job "monitoring" {
         }
 
         task "prometheus" {
+           
             template {
                 change_mode = "noop"
                 destination = "local/prometheus.yml"
@@ -119,8 +120,11 @@ EOH
 
         task "grafana" {
             driver = "docker"
+              meta {
+    FABIO_URL = "fabio.eu-guystack.hashidemos.io"
+  }
             env {
-                "GF_SERVER_DOMAIN"="fabio.ric-lnd-stack.hashidemos.io"
+                "GF_SERVER_DOMAIN"="${meta.FABIO_URL}"
                 "GF_SERVER_ROOT_URL"="%(protocol)s://%(domain)s/grafana/"
             }
             config {
