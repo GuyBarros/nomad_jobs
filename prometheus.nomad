@@ -124,7 +124,7 @@ EOH
     FABIO_URL = "fabio.eu-guystack.hashidemos.io"
   }
             env {
-                "GF_SERVER_DOMAIN"="${meta.FABIO_URL}"
+                "GF_SERVER_DOMAIN"="fabio.eu-guystack.guy.aws.hashidemos.io"
                 "GF_SERVER_ROOT_URL"="%(protocol)s://%(domain)s/grafana/"
             }
             config {
