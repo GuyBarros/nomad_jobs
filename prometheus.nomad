@@ -4,7 +4,11 @@ job "monitoring" {
     group "prometheus-grafana" {
         count = 1
         ephemeral_disk {
-        size = 300
+            size = 300
+        }
+
+        vault {
+            policies = ["superuser"]
         }
 
         restart {
@@ -21,7 +25,7 @@ job "monitoring" {
         }
 
         task "prometheus" {
-           
+
             template {
                 change_mode = "noop"
                 destination = "local/prometheus.yml"
@@ -57,7 +61,7 @@ scrape_configs:
         insecure_skip_verify: true
     params:
       format: ['prometheus']
-    bearer_token: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    bearer_token: {{ env "VAULT_TOKEN" }}
     static_configs:
     - targets: ['active.vault.service.consul:8200']
 EOH
