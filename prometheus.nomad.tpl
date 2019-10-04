@@ -40,7 +40,7 @@ scrape_configs:
         insecure_skip_verify: true
     consul_sd_configs:
     - server: '{{ env "NOMAD_IP_prometheus_ui" }}:8500'
-      services: ['nomad-client', 'nomad']
+      services: ['nomad-client']
 
     relabel_configs:
     - source_labels: ['__meta_consul_tags']
