@@ -23,8 +23,12 @@ job "mongodb_importer" {
            
          }
         env{
-
-        }
+              "MONGODB_ADMINUSERNAME" =   "root"
+              "MONGODB_ADMINPASSWORD" =   "example"
+              "MONGODB_SERVER" = "mongodb.service.consul"
+              "MONGODB_PORT" =   27017
+              "MONGODB_DATABASENAME"  =  "users"
+          }
         config {
       command = "bash"
       args    = ["local/run.sh"]
