@@ -98,13 +98,13 @@ resource "grafana_data_source" "prometheus" {
   is_default    = "true"
 }
 resource "grafana_dashboard" "Nomad" {
-  config_json = "${file("grafana/Nomad.json")}"
+  config_json = "${file("./grafana/Nomad.json")}"
 }
 resource "grafana_dashboard" "Consul" {
-  config_json = "${file("grafana/Consul.json")}"
+  config_json = "${file("./grafana/Consul.json")}"
 }
 resource "grafana_dashboard" "Vault" {
-  config_json = "${file("grafana/Vault.json")}"
+  config_json = "${file("./grafana/Vault.json")}"
 }
 
 # resource "grafana_data_source" "influxdb" {
