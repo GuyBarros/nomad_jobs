@@ -54,15 +54,15 @@ resource "nomad_job" "vaultupdater" {
   jobspec = "${file("./vaultupdater.nomad")}"
 }
 
-# data "template_file" "vault-ssh-helper" {
-#   template = "${file("./vault-ssh-helper.nomad.tpl")}"
-#   vars = {
-#     nomad_node = "ric-lnd-stack-server-0"
-#   }
-# }
-# resource "nomad_job" "vault-ssh-helper" {
-#   jobspec = "${data.template_file.vault-ssh-helper.rendered}"
-# }
+ data "template_file" "vault-ssh-helper" {
+   template = "${file("./vault-ssh-helper.nomad.tpl")}"
+   vars = {
+     nomad_node = "server-0.eu-guystack.guy.aws.hashidemos.io"
+   }
+ }
+ resource "nomad_job" "vault-ssh-helper" {
+   jobspec = "${data.template_file.vault-ssh-helper.rendered}"
+ }
 
 
 # data "template_file" "vault-ssh-ca" {
