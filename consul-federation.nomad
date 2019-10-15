@@ -12,7 +12,7 @@ job "consul_federation" {
 
   config {
     command = "/usr/local/bin/consul"
-    args    = ["join","-wan","server-0.sp-guystack.hashidemos.io"]
+    args    = ["join","-wan","server-0.sp-guystack.guy.aws.hashidemos.io"]
   }
   }
 }
