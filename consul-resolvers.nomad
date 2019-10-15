@@ -30,6 +30,7 @@ EOF
 
 consul config write count-api.hcl
 consul config write resolver.hcl
+
 EOH
 
       destination = "script.sh"
