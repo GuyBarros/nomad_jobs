@@ -29,13 +29,17 @@ resource "nomad_job" "hashibo" {
   jobspec = "${file("./hashibo.nomad")}"
 }
 
+
 resource "nomad_job" "consul-federation" {
   jobspec = "${file("./consul-federation.nomad")}"
 }
 
+
+
 # resource "nomad_job" "nomad-federation" {
 #   jobspec = "${file("./nomad_federation.nomad")}"
 # }
+
 resource "nomad_job" "countapi" {
   jobspec = "${file("./countapi.nomad")}"
 }
