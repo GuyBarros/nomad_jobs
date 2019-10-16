@@ -38,7 +38,9 @@ resource "nomad_job" "consul-federation" {
 # }
 resource "nomad_job" "countapi" {
   jobspec = "${file("./countapi.nomad")}"
-}resource "nomad_job" "countdashboard" {
+}
+
+resource "nomad_job" "countdashboard" {
   jobspec = "${file("./countdashboard.nomad")}"
 }
 
@@ -62,7 +64,7 @@ resource "nomad_job" "vaultupdater" {
  data "template_file" "vault-ssh-helper" {
    template = "${file("./vault-ssh-helper.nomad.tpl")}"
    vars = {
-     nomad_node = "server-0.eu-guystack.guy.aws.hashidemos.io"
+     nomad_node = var.nomad_node
    }
  }
  resource "nomad_job" "vault-ssh-helper" {
