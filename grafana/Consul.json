@@ -82,7 +82,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "consul_raft_leader_lastcontact_count",
+          "expr": "consul_raft_leader_lastContact_count",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -166,7 +166,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "COUNT (changes(consul_memberlist_gossep_sum[1m]) > 0) BY (labels)",
+          "expr": "COUNT (changes(consul_memberlist_gossip_sum[1m]) > 0) BY (labels)",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -562,7 +562,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(consul_memberlist_tcp{host=\"$consul\"}[1m])",
+          "expr": "irate(consul_memberlist_tcp_connect{host=\"$consul\"}[1m]) + irate(consul_memberlist_tcp_accept{host=\"$consul\"}[1m]) + irate(consul_memberlist_tcp_sent{host=\"$consul\"}[1m])",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -654,7 +654,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(consul_memberlist_udp{host=\"$consul\"}[1m])",
+          "expr": "irate(consul_memberlist_udp_received{host=\"$consul\"}[1m]) + irate(consul_memberlist_udp_sent{host=\"$consul\"}[1m])",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1457,7 +1457,7 @@
         "multi": false,
         "name": "consul",
         "options": [],
-        "query": "label_values(consul_memberlist_gossep_sum, host)",
+        "query": "label_values(consul_memberlist_gossip_sum, host)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
