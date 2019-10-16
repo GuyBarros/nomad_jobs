@@ -36,6 +36,11 @@ resource "nomad_job" "consul-federation" {
 # resource "nomad_job" "nomad-federation" {
 #   jobspec = "${file("./nomad_federation.nomad")}"
 # }
+resource "nomad_job" "countapi" {
+  jobspec = "${file("./countapi.nomad")}"
+}resource "nomad_job" "countdashboard" {
+  jobspec = "${file("./countdashboard.nomad")}"
+}
 
 resource "nomad_job" "postgresSQL" {
   jobspec = "${file("./postgresSQL.nomad")}"
