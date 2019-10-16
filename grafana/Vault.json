@@ -66,7 +66,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(idelta(vault_route_count{method=~\"create|delete|renew\"}[5m])) by (method, path)",
+          "expr": "sum(idelta(vault_route_count{method=~\"create|revoke|renew|update\"}[5m])) by (method, path)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{ method }}:{{path}}",
@@ -1111,7 +1111,7 @@
       },
       "id": 32,
       "panels": [],
-      "title": "Google Cloud Storage",
+      "title": "Vault Storage",
       "type": "row"
     },
     {
@@ -1157,7 +1157,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "round(irate(vault_gcs_list_count[10m]))",
+          "expr": "round(irate(vault_consul_list_count[10m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "list",
@@ -1168,7 +1168,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Cloud Storage List",
+      "title": "Storage List",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1249,7 +1249,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(vault_gcs_get_count[10m])",
+          "expr": "rate(vault_consul_get_count[10m])",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "GET",
@@ -1260,7 +1260,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Cloud Storage GET",
+      "title": "Storage GET",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1341,7 +1341,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(vault_gcs_delete_count[10m])",
+          "expr": "rate(vault_consul_delete_count[10m])",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Delete",
@@ -1352,7 +1352,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Cloud Storage Delete",
+      "title": "Storage Delete",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1431,7 +1431,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(vault_gcs_put_sum[5m])",
+          "expr": "irate(vault_consul_put_sum[5m])",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "PUT",
@@ -1442,7 +1442,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Cloud Storage PUT",
+      "title": "Storage PUT",
       "tooltip": {
         "shared": true,
         "sort": 0,

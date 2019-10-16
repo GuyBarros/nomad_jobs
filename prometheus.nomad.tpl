@@ -127,6 +127,21 @@ scrape_configs:
     bearer_token: {{ env "VAULT_TOKEN" }}
     static_configs:
     - targets: ['active.vault.service.consul:8200']
+
+    # https://www.robustperception.io/extracting-labels-from-legacy-metric-names
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: '(vault_route)_(\w[^_]+)_(\w+)_count'
+      replacement: '$${2}'
+      target_label: method
+    - source_labels: [__name__]
+      regex: '(vault_route)_(\w[^_]+)_(\w+)_count'
+      replacement: '$${3}'
+      target_label: path
+    - source_labels: [__name__]
+      regex: '(vault_route)_(\w[^_]+)_(\w+)_count'
+      replacement: '$${1}_count'
+      target_label: __name__
 EOH
             }
             driver = "docker"
@@ -191,6 +206,7 @@ EOH
             env {
                 "GF_SERVER_DOMAIN"="${fabio_srv}"
                 "GF_SERVER_ROOT_URL"="%(protocol)s://%(domain)s/grafana/"
+                "GF_DEFAULT_THEME"="light"
             }
             config {
                 image = "grafana/grafana"
