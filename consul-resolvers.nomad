@@ -3,7 +3,7 @@ job "Consul-Resolvers" {
  datacenters = ["eu-west-2","eu-west-1","ukwest","sa-east-1","ap-northeast-1","dc1","europe-west3-dc"]
   type = "batch"
   task "resolver-for-countapi" {
-    
+
     driver = "exec"
 
     template {
@@ -28,8 +28,17 @@ service    = "count-api"
 }
 EOF
 
+cat << EOF >  proxy-defaults.hcl
+{
+    "Kind": "proxy-defaults",
+    "Name": "global",
+    "MeshGateway": "local"
+}
+EOF
+
 consul config write count-api.hcl
 consul config write resolver.hcl
+consul config write proxy-defaults.hcl
 
 EOH
 
