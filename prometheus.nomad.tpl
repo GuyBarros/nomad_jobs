@@ -35,7 +35,7 @@ global:
   evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
 scrape_configs:
   - job_name: 'nomad_metrics'
-    scheme: "https"
+    scheme: 'https'
     tls_config:
         insecure_skip_verify: true
     consul_sd_configs:
@@ -51,6 +51,29 @@ scrape_configs:
     metrics_path: /v1/metrics
     params:
       format: ['prometheus']
+
+  - job_name: 'consul_metrics'
+    scheme: 'http'
+    consul_sd_configs:
+    - server: '{{ env "NOMAD_IP_prometheus_ui" }}:8500'
+      services:
+        - 'consul'
+
+    scrape_interval: 5s
+    metrics_path: /v1/agent/metrics
+    params:
+      format: ['prometheus']
+
+    relabel_configs:
+    - source_labels: [__address__]
+      regex: ^(.*):(.*)$
+      target_label: __address__
+      replacement: $${1}:8500
+
+    - source_labels: [__meta_consul_node]
+      regex: (.*)
+      target_label: host
+      replacement: $${1}
 
   - job_name: 'prometheus'
     static_configs:
