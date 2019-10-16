@@ -562,7 +562,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(consul_memberlist_tcp_connect{host=\"$consul\"}[1m]) + irate(consul_memberlist_tcp_accept{host=\"$consul\"}[1m]) + irate(consul_memberlist_tcp_sent{host=\"$consul\"}[1m])",
+          "expr": "irate(consul_memberlist_tcp_count{host=\"$consul\"}[1m])",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -654,7 +654,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(consul_memberlist_udp_received{host=\"$consul\"}[1m]) + irate(consul_memberlist_udp_sent{host=\"$consul\"}[1m])",
+          "expr": "irate(consul_memberlist_udp_count{host=\"$consul\"}[1m])",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -746,7 +746,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "consul_raft_replication_appendEntries_rpc",
+          "expr": "consul_raft_replication_appendEntries_rpc{quantile=~\"0.9|0.00|0.5\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -837,7 +837,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "consul_raft_replication_heartbeat",
+          "expr": "consul_raft_replication_heartbeat{quantile=~\"0.9|0.00|0.5\"}",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1205,7 +1205,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "consul_raft_leader_lastcontact",
+          "expr": "consul_raft_leader_lastContact",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "{{quantile}}%",

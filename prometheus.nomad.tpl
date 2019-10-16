@@ -75,6 +75,44 @@ scrape_configs:
       target_label: host
       replacement: $${1}
 
+# https://www.robustperception.io/extracting-labels-from-legacy-metric-names
+    metric_relabel_configs:
+    - source_labels: [__name__]
+      regex: '(consul_memberlist_tcp)_(.*)'
+      replacement: '$${2}'
+      target_label: type
+    - source_labels: [__name__]
+      regex: '(consul_memberlist_tcp)_(.*)'
+      replacement: '$${1}_count'
+      target_label: __name__
+
+    - source_labels: [__name__]
+      regex: '(consul_memberlist_udp)_(.*)'
+      replacement: '$${2}'
+      target_label: type
+    - source_labels: [__name__]
+      regex: '(consul_memberlist_udp)_(.*)'
+      replacement: '$${1}_count'
+      target_label: __name__
+
+    - source_labels: [__name__]
+      regex: '(consul_raft_replication_heartbeat)_(.+)(_\w?)?'
+      replacement: '$${2}'
+      target_label: query
+    - source_labels: [__name__]
+      regex: '(consul_raft_replication_heartbeat)_(.+)(_\w?)?'
+      replacement: '$${1}$${3}'
+      target_label: __name__
+
+    - source_labels: [__name__]
+      regex: '(consul_raft_replication_appendEntries_rpc)_(.+)(_\w?)?'
+      replacement: '$${2}'
+      target_label: query
+    - source_labels: [__name__]
+      regex: '(consul_raft_replication_appendEntries_rpc)_(.+)(_\w?)?'
+      replacement: '$${1}$${3}'
+      target_label: __name__
+
   - job_name: 'prometheus'
     static_configs:
     - targets: ['localhost:9090']
