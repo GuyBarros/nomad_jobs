@@ -16,7 +16,7 @@
   "editable": true,
   "gnetId": 7700,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 3,
   "links": [],
   "panels": [
     {
@@ -29,8 +29,8 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 9,
-        "w": 10,
-        "x": 4,
+        "w": 12,
+        "x": 0,
         "y": 0
       },
       "id": 24,
@@ -66,7 +66,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(idelta(vault_route_count{method=~\"create|revoke|renew|update\"}[5m])) by (method, path)",
+          "expr": "sum(idelta(vault_route_count{method=~\"create|revoke|renew|update|delete\"}[5m])) by (method, path)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{ method }}:{{path}}",
@@ -126,8 +126,8 @@
       "fillGradient": 0,
       "gridPos": {
         "h": 9,
-        "w": 10,
-        "x": 14,
+        "w": 12,
+        "x": 12,
         "y": 0
       },
       "id": 35,
@@ -210,190 +210,6 @@
         "align": false,
         "alignLevel": null
       }
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": true,
-      "colors": [
-        "#299c46",
-        "#629e51",
-        "#d44a3a"
-      ],
-      "datasource": "prometheus",
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 4,
-        "x": 0,
-        "y": 5
-      },
-      "id": 25,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "options": {},
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "expr": "avg_over_time(vault_sys_sealed{}[15s])",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "refId": "A"
-        }
-      ],
-      "thresholds": "0,1",
-      "title": "",
-      "transparent": true,
-      "type": "singlestat",
-      "valueFontSize": "100%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        },
-        {
-          "op": "=",
-          "text": "UNSEALED",
-          "value": "0"
-        },
-        {
-          "op": "=",
-          "text": "SEALD",
-          "value": "1"
-        }
-      ],
-      "valueName": "current"
-    },
-    {
-      "cacheTimeout": null,
-      "colorBackground": false,
-      "colorValue": true,
-      "colors": [
-        "#299c46",
-        "#e24d42",
-        "#7eb26d"
-      ],
-      "datasource": "prometheus",
-      "format": "none",
-      "gauge": {
-        "maxValue": 100,
-        "minValue": 0,
-        "show": false,
-        "thresholdLabels": false,
-        "thresholdMarkers": true
-      },
-      "gridPos": {
-        "h": 2,
-        "w": 4,
-        "x": 0,
-        "y": 7
-      },
-      "id": 37,
-      "interval": null,
-      "links": [],
-      "mappingType": 1,
-      "mappingTypes": [
-        {
-          "name": "value to text",
-          "value": 1
-        },
-        {
-          "name": "range to text",
-          "value": 2
-        }
-      ],
-      "maxDataPoints": 100,
-      "nullPointMode": "connected",
-      "nullText": null,
-      "options": {},
-      "postfix": "",
-      "postfixFontSize": "50%",
-      "prefix": "",
-      "prefixFontSize": "50%",
-      "rangeMaps": [
-        {
-          "from": "null",
-          "text": "N/A",
-          "to": "null"
-        }
-      ],
-      "sparkline": {
-        "fillColor": "rgba(31, 118, 189, 0.18)",
-        "full": false,
-        "lineColor": "rgb(31, 120, 193)",
-        "show": false
-      },
-      "tableColumn": "",
-      "targets": [
-        {
-          "expr": "avg_over_time(vault_sys_initialized{}[15s])",
-          "format": "time_series",
-          "intervalFactor": 1,
-          "refId": "A"
-        }
-      ],
-      "thresholds": "0,1",
-      "title": "",
-      "transparent": true,
-      "type": "singlestat",
-      "valueFontSize": "50%",
-      "valueMaps": [
-        {
-          "op": "=",
-          "text": "N/A",
-          "value": "null"
-        },
-        {
-          "op": "=",
-          "text": "UNINITIALISED",
-          "value": "0"
-        },
-        {
-          "op": "=",
-          "text": "INITIALISED",
-          "value": "1"
-        }
-      ],
-      "valueName": "current"
     },
     {
       "collapsed": false,
@@ -1249,7 +1065,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(vault_consul_get_count[10m])",
+          "expr": "round(irate(vault_consul_get_count[10m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "GET",
@@ -1341,7 +1157,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(vault_consul_delete_count[10m])",
+          "expr": "round(irate(vault_consul_delete_count[10m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Delete",
@@ -1431,7 +1247,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(vault_consul_put_sum[5m])",
+          "expr": "round(irate(vault_consul_put_count[10m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "PUT",
@@ -1519,6 +1335,6 @@
   },
   "timezone": "",
   "title": "Vault",
-  "uid": "_a16NUpiz2",
-  "version": 2
+  "uid": "Kp2O1ToZz",
+  "version": 3
 }
