@@ -10,6 +10,17 @@ job "Consul-Resolvers" {
       data = <<EOH
 set -v
 
+cat << EOF >  proxy-defaults.hcl
+{
+    "Kind": "proxy-defaults",
+    "Name": "global",
+MeshGateway : {
+  mode : "local"
+}
+}
+EOF
+
+
 cat << EOF > count-api.hcl
 Kind = "service-defaults"
 Name = "count-api"
@@ -25,14 +36,6 @@ name = "count-api"
 redirect {
 service    = "count-api"
   datacenter = "eu-west-2"
-}
-EOF
-
-cat << EOF >  proxy-defaults.hcl
-{
-    "Kind": "proxy-defaults",
-    "Name": "global",
-    "MeshGateway": "local"
 }
 EOF
 
