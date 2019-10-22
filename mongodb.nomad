@@ -1,6 +1,3 @@
-#vault secrets enable database
-# vault write database/config/my-mongodb-database plugin_name=mongodb-database-plugin allowed_roles="my-role" connection_url="mongodb://{{username}}:{{password}}@mongodb.service.consul:27017/admin?ssl=true" username="root"  password="rootpassword"
-# vault write database/roles/my-role db_name=my-mongodb-database creation_statements='{ "db": "admin", "roles": [{ "role": "readWrite" }, {"role": "read", "db": "foo"}] }' default_ttl="1h" max_ttl="24h"
 job "mongodb" {
   datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1"]
    type = "service"
@@ -10,7 +7,9 @@ job "mongodb" {
       type = "host"
         source = "mongodb_mount"
     }
-    
+     network {
+                    mode = "bridge"
+                }
     task "mongodb" {
             driver = "docker"
             env {
@@ -23,10 +22,6 @@ job "mongodb" {
                }
             config {
                 image = "mongo"
-                network_mode = "host"
-                port_map {
-                     db = 27017
-                }
             }
  
             logs {
@@ -36,46 +31,38 @@ job "mongodb" {
             resources {
                 cpu = 500
                 memory = 512
-                network {
-                     mode = "bridge"
-                     port "db" {
-                      static = 27017
-                      to     = 27017
-                     }
-                }  
             }
-            service {
+           
+        }
+         service {
                 name = "mongodb"
                 tags = ["mongodb"]
-                port = "db"
+                port = "27017"
                  connect {
      sidecar_service {}
    }
-                check {
-                    type = "tcp"
-                    interval = "10s"
-                    timeout = "4s"
-                }
             }
-        }
     }
  
     group "express" {
         count = 1
+        network {
+              mode = "bridge"
+              port "http" {
+      static = 8081
+      to     = 8081
+    }
+                }  
     task "mongo-express" {
             driver = "docker"
             env {
                 "ME_CONFIG_MONGODB_ADMINUSERNAME" = "root"
                 "ME_CONFIG_MONGODB_ADMINPASSWORD" = "example"
-                "ME_CONFIG_MONGODB_SERVER" = "mongodb.service.consul"
+                "ME_CONFIG_MONGODB_SERVER" = "127.0.0.1"
                 "ME_CONFIG_MONGODB_PORT" = "27017"
             }
             config {
                 image = "mongo-express"
-                network_mode = "host"
-                port_map {
-                     http = 8081
-                }
             }
  
             logs {
@@ -85,24 +72,25 @@ job "mongodb" {
             resources {
                 cpu = 500
                 memory = 512
-                network {
-                    mbits = 10
-                    port  "http"  { 
-                        static = 8081
-                    }
-                }  
+                
  
             }
-            service {
+         
+        }
+           service {
                 name = "mongo-express"
                 tags = ["mongo-express"]
                 port = "http"
-                check {
-                    type = "tcp"
-                    interval = "10s"
-                    timeout = "4s"
-                }
+                 connect {
+         sidecar_service {
+           proxy {
+             upstreams {
+               destination_name = "mongodb"
+               local_bind_port = 27017
+             }
+           }
+         }
+       }
             }
-        }
     }
 }
