@@ -8,10 +8,7 @@ job "mongodb" {
          count = 1
            volume "mongodb_vol" {
       type = "host"
- 
-      config {
         source = "mongodb_mount"
-      }
     }
     
     task "mongodb" {
@@ -40,17 +37,20 @@ job "mongodb" {
                 cpu = 500
                 memory = 512
                 network {
-                    mbits = 10
-                    port  "db"  { 
-                        static = 27017
-                    }
+                     mode = "bridge"
+                     port "db" {
+                      static = 27017
+                      to     = 27017
+                     }
                 }  
- 
             }
             service {
                 name = "mongodb"
                 tags = ["mongodb"]
                 port = "db"
+                 connect {
+     sidecar_service {}
+   }
                 check {
                     type = "tcp"
                     interval = "10s"
