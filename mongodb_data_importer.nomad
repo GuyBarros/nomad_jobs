@@ -1,10 +1,15 @@
 job "mongodb_importer" {
-  datacenters = ["dc1","eu-west-2"]
+  datacenters = ["eu-west-2"]
   type = "batch"
 
   group "import_data" {
     count = 1
-    
+     network {
+              mode = "host"
+              port "http" {
+      static = 8888
+    }
+                }  
      task "dummy_data" {
       driver = "exec"
 
@@ -23,9 +28,7 @@ job "mongodb_importer" {
            
          }
         env{
-              "MONGODB_ADMINUSERNAME" =   "root"
-              "MONGODB_ADMINPASSWORD" =   "example"
-              "MONGODB_SERVER" = "mongodb.service.consul"
+              "MONGODB_SERVER" = "localhost"
               "MONGODB_PORT" =   27017
               "MONGODB_DATABASENAME"  =  "users"
           }
@@ -34,7 +37,22 @@ job "mongodb_importer" {
       args    = ["local/run.sh"]
     }
 
-    } 
+    }
+        service {
+                name = "dataimporter"
+                tags = ["dataimporter"]
+                port = "http"
+                 connect {
+         sidecar_service {
+           proxy {
+             upstreams {
+               destination_name = "mongodb"
+               local_bind_port = 27017
+             }
+           }
+         }
+       }
+            } 
 
   }
 

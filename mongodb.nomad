@@ -12,10 +12,6 @@ job "mongodb" {
                 }
     task "mongodb" {
             driver = "docker"
-            env {
-               "MONGO_INITDB_ROOT_USERNAME" = "root"
-               "MONGO_INITDB_ROOT_PASSWORD" = "example"
-            }
             volume_mount {
                 volume      = "mongodb_vol"
                 destination = "/data/db"
@@ -56,8 +52,6 @@ job "mongodb" {
     task "mongo-express" {
             driver = "docker"
             env {
-                "ME_CONFIG_MONGODB_ADMINUSERNAME" = "root"
-                "ME_CONFIG_MONGODB_ADMINPASSWORD" = "example"
                 "ME_CONFIG_MONGODB_SERVER" = "127.0.0.1"
                 "ME_CONFIG_MONGODB_PORT" = "27017"
             }

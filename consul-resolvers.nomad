@@ -10,7 +10,7 @@ job "Consul-Resolvers" {
       data = <<EOH
 set -v
 
-cat << EOF >  proxy-defaults.hcl
+cat << EOF >  proxy-defaults.json
 {
     "Kind": "proxy-defaults",
     "Name": "global",
@@ -39,9 +39,10 @@ service    = "count-api"
 }
 EOF
 
+consul config write proxy-defaults.json
 consul config write count-api.hcl
 consul config write resolver.hcl
-consul config write proxy-defaults.hcl
+
 
 EOH
 
