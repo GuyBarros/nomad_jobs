@@ -18,12 +18,46 @@ job "pgadmin4" {
         port_map {
           db = 5050
         }
+        volumes = [
+          "local/servers.json:/servers.json",
+          "local/servers.passfile:/root/.pgpass"
+        ]
 
+      }
+      template {
+        perms = "600"
+        change_mode = "noop"
+        destination = "local/servers.passfile"
+        data = <<EOH
+postgres.service.consul:5432:postgres:root:rootpassword
+EOH
+      }
+      template {
+        change_mode = "noop"
+        destination = "local/servers.json"
+        data = <<EOH
+{
+  "Servers": {
+    "1": {
+      "Name": "Local Server",
+      "Group": "Server Group 1",
+      "Port": "5432",
+      "Username": "root",
+      "PassFile": "/root/.pgpass",
+      "Host": "postgres.service.consul",
+      "SSLMode": "disable",
+      "MaintenanceDB": "postgres"
+    }
+  }
+}
+EOH
       }
       env {
         PGADMIN_DEFAULT_EMAIL="youremail@yourdomain.com",
         PGADMIN_DEFAULT_PASSWORD="yoursecurepassword",
         PGADMIN_LISTEN_PORT="5050"
+        PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION="False"
+        PGADMIN_SERVER_JSON_FILE="/servers.json"
       }
 
 logs {
@@ -43,7 +77,7 @@ logs {
       }
       service {
         name = "pgadmin"
-        tags = [ "urlprefix-/pgadmin", "strip=/pgadmin"]
+        tags = [ "urlprefix-/pgadmin strip=/pgadmin"]
         port = "ui"
 
         check {
@@ -62,8 +96,6 @@ logs {
     }
 
   }
-
-
 
   update {
     max_parallel = 1

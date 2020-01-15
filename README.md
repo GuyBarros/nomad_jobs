@@ -1,11 +1,17 @@
-# nomad_jobs
+# nomad_jobs <!-- omit in toc -->
+
 A collection of Nomad Jobds to run as part of the meanstack-consul-connect demo
 
 These are tightly coupled with the nomad created in the repo `terraform-aws-demostack`
 
 ***These should NOT be used as examples of a production deployment.***
+- [PortgreSQL dynamic credentials](#portgresql-dynamic-credentials)
+- [Vault SSH OTP](#vault-ssh-otp)
+- [Vault SSH CA](#vault-ssh-ca)
+- [LDAP Auth](#ldap-auth)
 
-## List demos
+## List demos <!-- omit in toc -->
+<a id="markdown-portgresql-dynamic-credentials" name="portgresql-dynamic-credentials"></a>
 ### PortgreSQL dynamic credentials
 Declare the following in your `runjobs.tf`
 ``` javascript
@@ -19,7 +25,7 @@ resource "nomad_job" "pgadmin" {
 ```
 This first script will deploy the PostgreSQL database, whilst the second one will deploy the PGAdmin tool.
 
-Once you open the _pgadmin_ tool, you can configure it to access your database with:
+Once you open the _pgadmin_ tool, there's already a preconfigured connection named `Server Group 1` with:
 * postgres.service.consul:5432
 * username="root"
 * password="rootpassword"
@@ -40,7 +46,8 @@ You can find the `readonly.sql` file in this repo.
 vault read database/creds/readonly
 ```
 
-### Vault SSH OTP demo
+<a id="markdown-vault-ssh-otp-demo" name="vault-ssh-otp-demo"></a>
+### Vault SSH OTP
 
 Declare the following in your `runjobs.tf`, where `nomad_node` is your nomad node name for ssh.
 
@@ -70,7 +77,8 @@ And from your client machine you'll be able to accessthe node:
 vault ssh -role otp_key_role -mode otp -strict-host-key-checking=no ubuntu@<nomad_node_ip/host>
 ```
 
-### Vault SSH CA demo
+<a id="markdown-vault-ssh-ca-demo" name="vault-ssh-ca-demo"></a>
+### Vault SSH CA
 
 Declare the following in your `runjobs.tf`, where `nomad_node` is your nomad node name for ssh.
 
@@ -103,7 +111,8 @@ ssh-keygen -Lf  signed-cert.pub
 ssh -i signed-cert.pub -i ~/.ssh/id_rsa ubuntu@<nomad_node_ip/hostname>
 ```
 
-### LDAP demo
+<a id="markdown-ldap-demo" name="ldap-demo"></a>
+### LDAP Auth
 
 Declare the following in your `runjobs.tf`,
 
@@ -116,6 +125,6 @@ resource "nomad_job" "phpldapadmin" {
 }
 ```
 
-Optionally, you can login via `fabio` on `http://fabio.<demo stack namespace>.hashidemos.io:9999/phpldapadmin-server/` as `cn=admin,dc=example,dc=org` and import the [LDAPVAULT.LDIF](LDAPVAULT.LDIF) file (don't stop on errors)
+You can login via `fabio` on `http://fabio.<demo stack namespace>.hashidemos.io:9999/phpldapadmin-server/` as `cn=admin,dc=example,dc=org`, to view the users that are pre-loaded.
 
 To configure vault for the control groups demo, see [LDAP-configure-Vault-Script](LDAP-configure-Vault-Script.md)
