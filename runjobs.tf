@@ -4,8 +4,8 @@ provider "nomad" {
 }
 locals {
   fabio  = "${data.terraform_remote_state.demostack.outputs.Primary_Fabio}"
-  workers = "${data.terraform_remote_state.demostack.outputs.nomad_tag_workers}"
-  servers = "${data.terraform_remote_state.demostack.outputs.nomad_tag_servers}"
+  workers = "${data.terraform_remote_state.demostack.outputs.Primary_nomad_tag_workers}"
+  servers = "${data.terraform_remote_state.demostack.outputs.Primary_nomad_tag_servers}"
 }
 
 
@@ -22,6 +22,7 @@ data "terraform_remote_state" "demostack" {
   } //config
 }
 
+/*
 # Register a job
 resource "nomad_job" "nginx-pki" {
   jobspec = "${file("./nginx-pki.nomad")}"
@@ -30,6 +31,7 @@ resource "nomad_job" "nginx-pki" {
 resource "nomad_job" "hashibo" {
   jobspec = "${file("./hashibo.nomad")}"
 }
+*/
 
 /*
 resource "nomad_job" "consul-federation" {
@@ -49,7 +51,7 @@ resource "nomad_job" "countapi" {
 resource "nomad_job" "countdashboard" {
   jobspec = "${file("./countdashboard.nomad")}"
 }
-
+*/
 resource "nomad_job" "postgresSQL" {
   jobspec = "${file("./postgresSQL.nomad")}"
 }
@@ -64,10 +66,10 @@ resource "nomad_job" "phpldapadmin" {
   jobspec = "${file("./phpldapadmin.nomad")}"
 }
 resource "nomad_job" "vaultupdater" {
-  jonspec = "${file("./vaultupdater.nomad")}"
+  jobspec = "${file("./vaultupdater.nomad")}"
 }
-*/
 
+/*
  data "template_file" "vault-ssh-helper" {
    count = length(local.workers)
    template = "${file("./vault-ssh-helper.nomad.tpl")}"
@@ -80,7 +82,7 @@ resource "nomad_job" "vaultupdater" {
   count = length(local.workers)
    jobspec = "${element(data.template_file.vault-ssh-helper.*.rendered, count.index)}"
  } 
-
+*/
 
 # data "template_file" "vault-ssh-helper#   template = ${file#   vars = {
 #     nomad_node = "ric-lnd-stack-server-1"
@@ -90,7 +92,7 @@ resource "nomad_job" "vaultupdater" {
 #   jobspec = "${data.template_file.vault-ssh-ca.rendered}"
 # }
 
-/*
+
 ### Monitoring Stack (may need to be applied twice)
 data "template_file" "prometheus_monitoring" {
   template = "${file("./prometheus.nomad.tpl")}"
@@ -131,4 +133,4 @@ resource "grafana_dashboard" "Vault" {
 #   password      = "bar"
 #   database_name = "mydb"
 # }
-*/
+
