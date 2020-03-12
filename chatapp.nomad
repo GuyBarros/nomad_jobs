@@ -1,5 +1,5 @@
 job "chat_docker" {
-  datacenters = ["eu-west-2","eu-west-3","ukwest","sa-east-1","ap-northeast-1","dc1"]
+  datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1","dc1-eu-west-2"]
   type = "service"
   group "chat-app" {
     count = 1
@@ -34,14 +34,14 @@ job "chat_docker" {
       port = "http"
       connect {
         sidecar_service {
-          tags { ["chat-app-proxy"] }
+          tags = ["chat-app-proxy"]
           proxy {
+            
             upstreams {
               destination_name = "mongodb"
               local_bind_port = 27017
             }
           }
-          
         }
       }
     }
