@@ -19,7 +19,7 @@ job "mongodb" {
             config {
                 image = "mongo"
             }
- 
+
             logs {
                 max_files     = 5
                 max_file_size = 15
@@ -28,7 +28,7 @@ job "mongodb" {
                 cpu = 500
                 memory = 512
             }
-           
+
         }
          service {
                 name = "mongodb"
@@ -39,16 +39,16 @@ job "mongodb" {
    }
             }
     }
- 
+
     group "express" {
         count = 1
         network {
               mode = "bridge"
               port "http" {
-      static = 8081
-      to     = 8081
+      static = 8082
+      to     = 8082
     }
-                }  
+                }
     task "mongo-express" {
             driver = "docker"
             env {
@@ -58,7 +58,7 @@ job "mongodb" {
             config {
                 image = "mongo-express"
             }
- 
+
             logs {
                 max_files     = 5
                 max_file_size = 15
@@ -66,10 +66,10 @@ job "mongodb" {
             resources {
                 cpu = 500
                 memory = 512
-                
- 
+
+
             }
-         
+
         }
            service {
                 name = "mongo-express"
