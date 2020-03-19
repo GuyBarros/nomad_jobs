@@ -37,7 +37,7 @@ job "traefik" {
 # Enable Consul Catalog configuration backend.
 [providers.consulCatalog]
   prefix = "traefik"
-  exposedByDefault = true
+  exposedByDefault = false
   [providers.consulCatalog.endpoint]
     address = "http://127.0.0.1:8500"
      scheme = "http"

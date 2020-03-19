@@ -28,8 +28,8 @@ job "demo-webapp" {
         port = "http"
 
         tags = [
-          "traefik.tags=service",
-          "traefik.frontend.rule=PathPrefixStrip:/myapp",
+          "traefik.enable=true",
+          "traefik.http.routers.chat.rule=PathPrefix(`/myapp`)",
         ]
 
         check {

@@ -34,7 +34,7 @@ job "chat-app" {
     service {
       name = "chat-app"
       tags = ["urlprefix-/chat",
-      "traefik.tags=service",
+      "traefik.enable=true",
       "traefik.http.routers.chat.rule=PathPrefix(`/chat`)||PathPrefix(`/socket.io`)",
       "traefik.http.services.chat.loadbalancer.sticky",
       "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto = https"
