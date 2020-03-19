@@ -9,9 +9,9 @@ job "nginx-proxy" {
     max_parallel = 1
   }
 
-  group "nginx" {
+  group "nginx-proxy" {
 
-    task "nginx" {
+    task "nginx-proxy" {
       driver = "docker"
 
       config {
@@ -50,6 +50,17 @@ server {
       proxy_pass http://myapp;
    }
 
+     location / {
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $host;
+
+      proxy_pass http://chat;
+
+      # enable WebSockets
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+    }
 
     location /chat/ {
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -95,8 +106,16 @@ EOF
       }
 
       service {
-        name = "nginx"
+        name = "nginx-proxy"
+        tags = ["nginx-proxy"]
         port = "http"
+          check {
+          name     = "nginx alive"
+          type     = "tcp"
+          port     = "http"
+          interval = "10s"
+          timeout  = "2s"
+        }
       }
     }
   }
