@@ -60,22 +60,27 @@ job "nginx" {
 
       template {
         data = <<EOH
-            <h2> Hello World </h2>
-            <br />
-            <br />
-           
-             from {{ env "node.unique.name" }}
-            <br />
-            <br />
-           
-            <br />
-	          <br />
-            {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=90m" }}
-            {{ .Data.certificate }}
-            <br />
-            <br />
-            {{ .Data.private_key }}
-            {{ end }}
+          <h2> Hello World </h2>
+          <br />
+          <br />
+
+            from {{ env "node.unique.name" }}
+          <br />
+            running on <b>Nginx Instance-{{ env "NOMAD_ALLOC_INDEX" }} </b>
+          <br />
+          <br />
+            Running in <b> Region {{ env "node.region"}} </b>
+          <br />
+          <br />
+            Running in <b> Datacenter {{ env "node.datacenter"}} </b>
+          <br />
+          <br />
+          {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=90m" }}
+          {{ .Data.certificate }}
+          <br />
+          <br />
+          {{ .Data.private_key }}
+          {{ end }}
         EOH
 
         destination = "local/data/nginx-pki/index.html"
@@ -87,10 +92,10 @@ job "nginx" {
         network {
           mbits = 10
           port "http" {
-            
+
           }
           port "https" {
-            
+
           }
         }
       }
