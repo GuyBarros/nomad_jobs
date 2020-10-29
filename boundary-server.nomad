@@ -17,14 +17,16 @@ job "boundary-server" {
       artifact {
         source     = "https://releases.hashicorp.com/boundary/0.1.1/boundary_0.1.1_linux_amd64.zip"
         # source      = "https://releases.hashicorp.com/boundary/0.1.1/boundary_0.1.1_${attr.kernel.name}_${attr.cpu.arch}.zip"
-        destination = "./tmp/"
+        destination = "tmp/"
         options {
           checksum = "sha256:10ac2ab9b46a0b0644eb08f9d2fb940734dc5c55c23d0ec43528bc73a591790b"
         }
       }
       template {
-        data        = <<EOF
-        listener "tcp" {
+        data        = <<TEMPLATEEOF
+echo "--> Generating boundary configuration"
+sudo tee tmp/config.hcl  <<"EOF"
+ listener "tcp" {
   address = "0.0.0.0"
   # The purpose of this listener block
   purpose = "api"
@@ -32,8 +34,8 @@ job "boundary-server" {
 
   # Uncomment to enable CORS for the Admin UI. Be sure to set the allowed origin(s)
   # to appropriate values.
-  #cors_enabled = true
-  #cors_allowed_origins = ["yourcorp.yourdomain.com"]
+  cors_enabled = true
+  cors_allowed_origins = ["*.hashidemos.io"]
 }
 
 listener "tcp" {
@@ -42,17 +44,6 @@ listener "tcp" {
   # The purpose of this listener
   purpose = "cluster"
   tls_disable = true
-}
-
-listener "tcp" {
-    purpose = "proxy"
-    tls_disable = true
-}
-
-worker {
-  name = "local-worker"
-  description = "A local worker"
-   public_addr = "server-2.eu-guystack.original.aws.hashidemos.io"
 }
 
 controller {
@@ -66,7 +57,7 @@ controller {
 kms "transit" {
   purpose            = "root"
   address            = "https://vault.service.consul:8200"
-  token              = "s.uGadFQIpc4aLqijmyMFo20Jk"
+  token              = "s.XTIw8fXc5zKpUhKUDoVH62mr"
   disable_renewal    = "true"
 
   // Key configuration
@@ -76,11 +67,10 @@ kms "transit" {
 
 }
 
-
 kms "transit" {
   purpose            = "worker-auth"
   address            = "https://vault.service.consul:8200"
-  token              = "s.uGadFQIpc4aLqijmyMFo20Jk"
+  token              = "s.XTIw8fXc5zKpUhKUDoVH62mr"
   disable_renewal    = "true"
 
   // Key configuration
@@ -89,24 +79,52 @@ kms "transit" {
   namespace          = "boundary/"
 
 }
-        EOF
-        destination = "./tmp/boundary.d/config.hcl"
+
+EOF
+
+echo "--> init config file"
+cat tmp/config.hcl
+
+echo "--> running boundary init"
+tmp/boundary database init -config=tmp/config.hcl >> init.txt
+
+echo "--> init output"
+cat init.txt
+
+echo "--> adding to consul"
+consul kv put service/boundary/init @init.txt
+
+echo "--> done"
+TEMPLATEEOF
+        destination = "init.sh"
       }
       config {
-        command = "./tmp/boundary"
-        args = ["database","init","-config=tmp/boundary.d/config.hcl" , ">","init.txt" ,"&&", "consul", "kv", "put", "service/boundary/init", "@init.txt"]
+      command = "bash"
+      args    = ["init.sh"]
       }
     }
+
+  ################################################################################################
+
     task "boundary.service" {
       driver = "raw_exec"
 
      constraint {
-        attribute = "${meta.type}"
-        value     = "server"
+        attribute = "${meta.name}"
+        value     = "EU-guystack-server-2"
       }
       resources {
         cpu = 2000
         memory = 1024
+        network {
+          mbits = 10
+          port  "ui"  {
+            static = 9200
+          }
+           port  "worker"  {
+            static = 9202
+          }
+        }
       }
       artifact {
          source     = "https://releases.hashicorp.com/boundary/0.1.1/boundary_0.1.1_linux_amd64.zip"
@@ -118,29 +136,25 @@ kms "transit" {
       }
       template {
         data        = <<EOF
-        listener "tcp" {
+      listener "tcp" {
   address = "0.0.0.0"
+  # The purpose of this listener block
   purpose = "api"
   tls_disable = true
-  }
+
+  # Uncomment to enable CORS for the Admin UI. Be sure to set the allowed origin(s)
+  # to appropriate values.
+  cors_enabled = true
+  cors_allowed_origins = ["*.hashidemos.io"]
+}
 
 listener "tcp" {
+  # Should be the IP of the NIC that the worker will connect on
   address = "0.0.0.0"
+  # The purpose of this listener
   purpose = "cluster"
   tls_disable = true
 }
-
-listener "tcp" {
-    purpose = "proxy"
-    tls_disable = true
-}
-
-worker {
-  name = "local-worker"
-  description = "A local worker"
-     public_addr = "server-2.eu-guystack.original.aws.hashidemos.io"
-}
-
 controller {
   name = "example-controller"
   description = "An example controller"
@@ -152,7 +166,7 @@ controller {
 kms "transit" {
   purpose            = "root"
   address            = "https://vault.service.consul:8200"
-  token              = "s.uGadFQIpc4aLqijmyMFo20Jk"
+  token              = "s.XTIw8fXc5zKpUhKUDoVH62mr"
   disable_renewal    = "true"
 
   // Key configuration
@@ -162,11 +176,10 @@ kms "transit" {
 
 }
 
-
 kms "transit" {
   purpose            = "worker-auth"
   address            = "https://vault.service.consul:8200"
-  token              = "s.uGadFQIpc4aLqijmyMFo20Jk"
+  token              = "s.XTIw8fXc5zKpUhKUDoVH62mr"
   disable_renewal    = "true"
 
   // Key configuration
@@ -176,14 +189,29 @@ kms "transit" {
 
 }
 
+
+
         EOF
-        destination = "./tmp/boundary.d/config.hcl"
+        destination = "tmp/config.hcl"
       }
       config {
         command = "/tmp/boundary"
-        args = ["server", "-config=tmp/boundary.d/config.hcl"]
+        args = ["server", "-config=tmp/config.hcl"]
+      }
+      service {
+        name = "boundary-server"
+        tags = ["boundary-server"]
+        port = "ui"
+
+        check {
+          name     = "alive"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
+        }
       }
     }
+
   }
 
   update {
