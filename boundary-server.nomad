@@ -2,10 +2,12 @@ job "boundary-server" {
  region = "global"
   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
   type = "service"
-
-  group "boundary-server" {
-    count = 1
-    task "boundary.init" {
+group "boundary-init" {
+ count = 1
+     vault {
+      policies = ["superuser"]
+    }
+     task "boundary.init" {
          lifecycle {
         hook    = "prestart"
       }
@@ -26,29 +28,31 @@ job "boundary-server" {
         data        = <<TEMPLATEEOF
 echo "--> Generating boundary configuration"
 sudo tee tmp/config.hcl  <<"EOF"
+disable_mlock = true
+
  listener "tcp" {
-  address = "0.0.0.0"
   # The purpose of this listener block
+  address = "{{ env  "attr.unique.network.ip-address" }}:9200"
   purpose = "api"
   tls_disable = true
 
   # Uncomment to enable CORS for the Admin UI. Be sure to set the allowed origin(s)
   # to appropriate values.
-  cors_enabled = true
-  cors_allowed_origins = ["*.hashidemos.io"]
+  # cors_enabled = true
+  # cors_allowed_origins = ["*"]
 }
 
 listener "tcp" {
   # Should be the IP of the NIC that the worker will connect on
-  address = "0.0.0.0"
+  address = "{{ env  "attr.unique.network.ip-address" }}:9201"
   # The purpose of this listener
   purpose = "cluster"
   tls_disable = true
 }
 
 controller {
-  name = "example-controller"
-  description = "An example controller"
+  name = "Server2-controller"
+  description = "Controller on Server 2"
   database {
     url = "postgresql://root:rootpassword@boundary-postgres.service.consul:5432/boundary?sslmode=disable"
   }
@@ -57,7 +61,6 @@ controller {
 kms "transit" {
   purpose            = "root"
   address            = "https://vault.service.consul:8200"
-  token              = "s.XTIw8fXc5zKpUhKUDoVH62mr"
   disable_renewal    = "true"
 
   // Key configuration
@@ -70,7 +73,6 @@ kms "transit" {
 kms "transit" {
   purpose            = "worker-auth"
   address            = "https://vault.service.consul:8200"
-  token              = "s.XTIw8fXc5zKpUhKUDoVH62mr"
   disable_renewal    = "true"
 
   // Key configuration
@@ -82,17 +84,21 @@ kms "transit" {
 
 EOF
 
-echo "--> init config file"
-cat tmp/config.hcl
-
 echo "--> running boundary init"
 tmp/boundary database init -config=tmp/config.hcl >> init.txt
 
 echo "--> init output"
 cat init.txt
 
+echo "-->  checking to see if database already initialized before writting to consul"
+if [ $(cat init.txt) != "Database already initialized" ]
+then
 echo "--> adding to consul"
 consul kv put service/boundary/init @init.txt
+else
+echo "--> Database already initialized, skipping"
+fi
+
 
 echo "--> done"
 TEMPLATEEOF
@@ -103,15 +109,18 @@ TEMPLATEEOF
       args    = ["init.sh"]
       }
     }
-
-  ################################################################################################
-
+}
+  group "boundary-server" {
+    count = 1
+        vault {
+      policies = ["superuser"]
+    }
     task "boundary.service" {
       driver = "raw_exec"
 
      constraint {
-        attribute = "${meta.name}"
-        value     = "EU-guystack-server-2"
+        attribute = "${meta.type}"
+        value     = "server"
       }
       resources {
         cpu = 2000
@@ -120,6 +129,9 @@ TEMPLATEEOF
           mbits = 10
           port  "ui"  {
             static = 9200
+          }
+           port  "cluster"  {
+            static = 9201
           }
            port  "worker"  {
             static = 9202
@@ -137,27 +149,27 @@ TEMPLATEEOF
       template {
         data        = <<EOF
       listener "tcp" {
-  address = "0.0.0.0"
+  address = "{{ env  "attr.unique.network.ip-address" }}:9200"
   # The purpose of this listener block
   purpose = "api"
   tls_disable = true
 
   # Uncomment to enable CORS for the Admin UI. Be sure to set the allowed origin(s)
   # to appropriate values.
-  cors_enabled = true
-  cors_allowed_origins = ["*.hashidemos.io"]
+  # cors_enabled = true
+  # cors_allowed_origins = ["*"]
 }
 
 listener "tcp" {
   # Should be the IP of the NIC that the worker will connect on
-  address = "0.0.0.0"
+  address = "{{ env  "attr.unique.network.ip-address" }}:9201"
   # The purpose of this listener
   purpose = "cluster"
   tls_disable = true
 }
 controller {
-  name = "example-controller"
-  description = "An example controller"
+  name = "Boundary-controller-{{ env "NOMAD_ALLOC_INDEX" }}"
+  description = "Controller on on {{ env "attr.unique.hostname" }}"
   database {
     url = "postgresql://root:rootpassword@boundary-postgres.service.consul:5432/boundary?sslmode=disable"
   }
@@ -166,7 +178,6 @@ controller {
 kms "transit" {
   purpose            = "root"
   address            = "https://vault.service.consul:8200"
-  token              = "s.XTIw8fXc5zKpUhKUDoVH62mr"
   disable_renewal    = "true"
 
   // Key configuration
@@ -179,7 +190,6 @@ kms "transit" {
 kms "transit" {
   purpose            = "worker-auth"
   address            = "https://vault.service.consul:8200"
-  token              = "s.XTIw8fXc5zKpUhKUDoVH62mr"
   disable_renewal    = "true"
 
   // Key configuration
@@ -200,7 +210,7 @@ kms "transit" {
       }
       service {
         name = "boundary-server"
-        tags = ["boundary-server"]
+        tags = ["boundary-server","server-${NOMAD_ALLOC_INDEX}"]
         port = "ui"
 
         check {

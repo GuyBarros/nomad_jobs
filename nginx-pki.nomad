@@ -1,5 +1,5 @@
 job "nginx" {
-   datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1","europe-west3-dc"]
+   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
   type = "service"
 
   group "withvault" {
@@ -63,11 +63,11 @@ job "nginx" {
             <h2> Hello World </h2>
             <br />
             <br />
-           
+
              from {{ env "node.unique.name" }}
             <br />
             <br />
-           
+
             <br />
 	          <br />
             {{ with secret "pki/issue/consul-service" "common_name=nginx.service.consul" "ttl=90m" }}
@@ -87,10 +87,10 @@ job "nginx" {
         network {
           mbits = 10
           port "http" {
-            
+
           }
           port "https" {
-            
+
           }
         }
       }

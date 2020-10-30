@@ -5,22 +5,29 @@ job "boundary-worker" {
 
   group "boundary-worker" {
     count = 1
+        vault {
+      policies = ["superuser"]
+    }
     task "boundary-worker.service" {
       driver = "raw_exec"
 
      constraint {
-        attribute = "${meta.name}"
-        value     = "EU-guystack-server-1"
+        attribute = "${meta.type}"
+        value     = "server"
       }
+
       resources {
         cpu = 2000
         memory = 1024
         network {
           mbits = 10
-          port  "ui"  {
+           port  "api"  {
             static = 9200
           }
-           port  "worker"  {
+           port  "cluster"  {
+            static = 9201
+          }
+          port  "worker"  {
             static = 9202
           }
         }
@@ -37,24 +44,24 @@ job "boundary-worker" {
         data        = <<EOF
         listener "tcp" {
     purpose = "proxy"
-    address = "0.0.0.0"
+    address = "{{ env  "attr.unique.network.ip-address" }}:9202"
     tls_disable = true
 }
 
 worker {
-  name = "local-worker"
-  description = "A local worker"
-   public_addr = "server-1.eu-guystack.original.aws.hashidemos.io"
-   address = "0.0.0.0"
+  name = "local-worker-{{ env "NOMAD_ALLOC_INDEX" }}"
+  description = "Worker on {{ env "attr.unique.hostname" }}"
+   public_addr = "{{ env "attr.unique.platform.aws.public-ipv4" }}"
    controllers = [
-    "boundary-server.service.consul",
+     {{ range service "boundary-server" }}
+        "{{ .Address }}:9201",
+     {{ end }}
   ]
 
 }
 kms "transit" {
   purpose            = "worker-auth"
   address            = "https://vault.service.consul:8200"
-  token              = "s.XTIw8fXc5zKpUhKUDoVH62mr"
   disable_renewal    = "true"
 
   // Key configuration
@@ -73,7 +80,7 @@ kms "transit" {
       }
       service {
         name = "boundary-worker"
-        tags = ["boundary-worker"]
+        tags = ["boundary-worker","worker-${NOMAD_ALLOC_INDEX}"]
         port = "worker"
 
         check {
