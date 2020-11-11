@@ -90,14 +90,15 @@ tmp/boundary database init -config=tmp/config.hcl >> init.txt
 echo "--> init output"
 cat init.txt
 
-echo "-->  checking to see if database already initialized before writting to consul"
-if [ $(cat init.txt) != "Database already initialized" ]
-then
+# echo "-->  checking to see if database already initialized before writting to consul"
+# if [ $(cat init.txt) == "Database already initialized" ]
+# then
+# echo "--> Database already initialized, skipping"
+# else
 echo "--> adding to consul"
-consul kv put service/boundary/init @init.txt
-else
-echo "--> Database already initialized, skipping"
-fi
+DATE=$(date +"%Y%m%d%H%M")
+consul kv put service/boundary/boundary-init-$DATE @init.txt
+# fi
 
 
 echo "--> done"
