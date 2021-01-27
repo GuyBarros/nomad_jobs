@@ -53,7 +53,7 @@ worker {
   description = "Worker on {{ env "attr.unique.hostname" }}"
    public_addr = "{{ env "attr.unique.platform.aws.public-ipv4" }}"
    controllers = [
-     {{ range service "boundary-server" }}
+     {{ range service "boundary-controller" }}
         "{{ .Address }}:9201",
      {{ end }}
   ]
