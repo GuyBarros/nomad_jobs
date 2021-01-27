@@ -5,6 +5,17 @@ job "boundary-worker" {
 
   group "boundary-worker" {
     count = 1
+    network {
+           port  "api"  {
+            static = 9200
+          }
+           port  "cluster"  {
+            static = 9201
+          }
+          port  "worker"  {
+            static = 9202
+          }
+        }
         vault {
       policies = ["superuser"]
     }
@@ -19,25 +30,14 @@ job "boundary-worker" {
       resources {
         cpu = 2000
         memory = 1024
-        network {
-          mbits = 10
-           port  "api"  {
-            static = 9200
-          }
-           port  "cluster"  {
-            static = 9201
-          }
-          port  "worker"  {
-            static = 9202
-          }
-        }
+        
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/0.1.1/boundary_0.1.1_linux_amd64.zip"
+         source     = "https://releases.hashicorp.com/boundary/0.1.4/boundary_0.1.4_linux_amd64.zip"
         # source      = "https://releases.hashicorp.com/boundary/0.1.1/boundary_0.1.1_${attr.kernel.name}_${attr.cpu.arch}.zip"
         destination = "./tmp/"
         options {
-          checksum = "sha256:10ac2ab9b46a0b0644eb08f9d2fb940734dc5c55c23d0ec43528bc73a591790b"
+          checksum = "sha256:87cd12bb77541c8da911221b5fe608bfed6b14daed60b6bfae5511400babc491"
         }
       }
       template {

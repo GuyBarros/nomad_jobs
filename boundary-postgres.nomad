@@ -6,15 +6,18 @@ job "boundary-postgres" {
   group "postgres" {
     count = 1
 
+network {
+        mode = "bridge"
+        port "db" { 
+          static = 5432
+           }
+     }
     task "postgres" {
 
       driver = "docker"
       config {
         image = "postgres"
-        network_mode = "host"
-        port_map {
-          db = 5432
-        }
+         ports = ["db"]
 
       }
       env {
@@ -31,13 +34,8 @@ job "boundary-postgres" {
       resources {
         cpu = 1000
         memory = 1024
-        network {
-          mbits = 10
-          port  "db"  {
-            static = 5432
-          }
-        }
       }
+  
       service {
         name = "boundary-postgres"
         tags = ["postgres for boundary"]
