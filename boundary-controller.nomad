@@ -2,12 +2,23 @@ job "boundary-controller" {
  region = "global"
   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
   type = "service"
-group "boundary-init" {
- count = 1
-     vault {
+  group "boundary-controller" {
+    count = 1
+     network {
+          port  "ui"  {
+            static = 9200
+          }
+           port  "cluster"  {
+            static = 9201
+          }
+           port  "worker"  {
+            static = 9202
+          }
+        }
+        vault {
       policies = ["superuser"]
     }
-     task "boundary.init" {
+         task "boundary.init" {
          lifecycle {
         hook    = "prestart"
       }
@@ -17,11 +28,11 @@ group "boundary-init" {
         memory = 512
       }
       artifact {
-        source     = "https://releases.hashicorp.com/boundary/0.1.4/boundary_0.1.4_linux_amd64.zip"
+        source     = "https://releases.hashicorp.com/boundary/0.1.8/boundary_0.1.8_linux_amd64.zip"
         # source      = "https://releases.hashicorp.com/boundary/0.1.1/boundary_0.1.1_${attr.kernel.name}_${attr.cpu.arch}.zip"
         destination = "tmp/"
         options {
-          checksum = "sha256:87cd12bb77541c8da911221b5fe608bfed6b14daed60b6bfae5511400babc491"
+          checksum = "sha256:22afe6070391c9d5a5d14e32a7b438b7ccd200e4d68862c1f10145f1afb09302"
         }
       }
       template {
@@ -51,8 +62,8 @@ listener "tcp" {
 }
 
 controller {
-  name = "Server2-controller"
-  description = "Controller on Server 2"
+  name = "boundary-controller-{{ env "NOMAD_ALLOC_INDEX" }}"
+  description = "Controller on on {{ env "attr.unique.hostname" }}"
   database {
     url = "postgresql://root:rootpassword@boundary-postgres.service.consul:5432/boundary?sslmode=disable"
   }
@@ -110,26 +121,12 @@ TEMPLATEEOF
       args    = ["init.sh"]
       }
     }
-}
-  group "boundary-controller" {
-    count = 1
-     network {
-          port  "ui"  {
-            static = 9200
-          }
-           port  "cluster"  {
-            static = 9201
-          }
-           port  "worker"  {
-            static = 9202
-          }
-        }
-        vault {
-      policies = ["superuser"]
-    }
+    
     task "boundary.service" {
       driver = "raw_exec"
-
+  lifecycle {
+        hook    = "poststart"
+      }
      constraint {
         attribute = "${meta.type}"
         value     = "server"
@@ -140,11 +137,11 @@ TEMPLATEEOF
        
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/0.1.4/boundary_0.1.4_linux_amd64.zip"
+         source     = "https://releases.hashicorp.com/boundary/0.1.8/boundary_0.1.8_linux_amd64.zip"
         # source      = "https://releases.hashicorp.com/boundary/0.1.1/boundary_0.1.1_${attr.kernel.name}_${attr.cpu.arch}.zip"
         destination = "./tmp/"
         options {
-          checksum = "sha256:87cd12bb77541c8da911221b5fe608bfed6b14daed60b6bfae5511400babc491"
+          checksum = "sha256:22afe6070391c9d5a5d14e32a7b438b7ccd200e4d68862c1f10145f1afb09302"
         }
       }
       template {
@@ -169,7 +166,7 @@ listener "tcp" {
   tls_disable = true
 }
 controller {
-  name = "Boundary-controller-{{ env "NOMAD_ALLOC_INDEX" }}"
+  name = "boundary-controller-{{ env "NOMAD_ALLOC_INDEX" }}"
   description = "Controller on on {{ env "attr.unique.hostname" }}"
   database {
     url = "postgresql://root:rootpassword@boundary-postgres.service.consul:5432/boundary?sslmode=disable"
