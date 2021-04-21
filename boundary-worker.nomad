@@ -30,7 +30,7 @@ job "boundary-worker" {
       resources {
         cpu = 2000
         memory = 1024
-        
+
       }
       artifact {
          source     = "https://releases.hashicorp.com/boundary/0.2.0/boundary_0.2.0_linux_amd64.zip"
