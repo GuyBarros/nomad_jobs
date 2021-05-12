@@ -28,11 +28,11 @@ job "boundary-controller" {
         memory = 512
       }
       artifact {
-        source     = "https://releases.hashicorp.com/boundary/0.2.0/boundary_0.2.0_linux_amd64.zip"
+        source     = "https://releases.hashicorp.com/boundary/0.2.1/boundary_0.2.1_linux_amd64.zip"
         # source      = "https://releases.hashicorp.com/boundary/0.1.1/boundary_0.1.1_${attr.kernel.name}_${attr.cpu.arch}.zip"
         destination = "tmp/"
         options {
-          checksum = "sha256:2d397294e7db4e4eeb2696d43560be3b81674a7ea3ad2cda2c547efbbee851e1"
+          checksum = "sha256:718ec76d17982606f1a8db8f5667f49ea498e7ce18990cccd669f3f65f0b58c4"
         }
       }
       template {
@@ -137,10 +137,10 @@ TEMPLATEEOF
 
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/0.2.0/boundary_0.2.0_linux_amd64.zip"
+         source     = "https://releases.hashicorp.com/boundary/0.2.1/boundary_0.2.1_linux_amd64.zip"
         destination = "./tmp/"
         options {
-          checksum = "sha256:2d397294e7db4e4eeb2696d43560be3b81674a7ea3ad2cda2c547efbbee851e1"
+          checksum = "sha256:718ec76d17982606f1a8db8f5667f49ea498e7ce18990cccd669f3f65f0b58c4"
         }
       }
       template {
