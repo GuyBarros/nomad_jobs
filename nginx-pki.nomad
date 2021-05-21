@@ -1,5 +1,5 @@
 job "nginx" {
-   datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1","europe-west3-dc"]
+   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
   type = "service"
 
   group "withvault" {
@@ -60,6 +60,7 @@ job "nginx" {
 
       template {
         data = <<EOH
+
           <h2> Hello World </h2>
           <br />
           <br />
