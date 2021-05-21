@@ -49,8 +49,8 @@ disable_mlock = true
 
   # Uncomment to enable CORS for the Admin UI. Be sure to set the allowed origin(s)
   # to appropriate values.
-  # cors_enabled = true
-  # cors_allowed_origins = ["*"]
+   cors_enabled = true
+   cors_allowed_origins = ["*"]
 }
 
 listener "tcp" {
