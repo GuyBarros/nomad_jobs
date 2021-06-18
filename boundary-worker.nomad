@@ -33,11 +33,11 @@ job "boundary-worker" {
 
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/0.2.1/boundary_0.2.1_linux_amd64.zip"
+         source     = "https://releases.hashicorp.com/boundary/0.3.0/boundary_0.3.0_linux_amd64.zip"
         # source      = "https://releases.hashicorp.com/boundary/0.1.1/boundary_0.1.1_${attr.kernel.name}_${attr.cpu.arch}.zip"
         destination = "./tmp/"
         options {
-          checksum = "sha256:718ec76d17982606f1a8db8f5667f49ea498e7ce18990cccd669f3f65f0b58c4"
+          checksum = "sha256:27758ae25702360f9d5a38d4e255670270719f952f47dce6469ee401f5f71f0a"
         }
       }
       template {
