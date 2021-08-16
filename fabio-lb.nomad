@@ -1,7 +1,6 @@
 job "fabio" {
   region = "global"
-  datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1","europe-west3-dc"]
-
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
   type     = "system"
   priority = 75
 

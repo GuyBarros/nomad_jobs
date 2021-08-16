@@ -1,0 +1,43 @@
+{
+    "$schema": "https://raw.githubusercontent.com/jboero/hashicorp-schemas/master/JSON/nomad/0.11/job.json",
+    "Affinities": {
+        "attribute": "${meta.rack}",
+        "value": "r1",
+        "weight": 50
+    }
+    "Constraint": {
+        "attribute": "${attr.kernel.name",
+        "value": "linux"
+    }{
+        "attribute": "${attr.kernel.name",
+        "value": "linux"
+    }{
+        "ID": "example",
+        "Name": "example",
+        "Type": "service",
+        "Priority": 50,
+        "Datacenters": [
+            "dc1"
+        ],
+        "TaskGroups": [
+            {
+                "Name": "example",
+                "Count": 1,
+                "Tasks": [
+                    {
+                        "Name": "example",
+                        "Driver": "exec",
+                        "Config": {
+                            "Command": "my-binary",
+                            "Args": [
+                                "-flag",
+                                "1"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+}
