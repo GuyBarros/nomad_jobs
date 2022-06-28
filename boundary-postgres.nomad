@@ -1,6 +1,6 @@
 job "boundary-postgres" {
  region = "global"
-  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2"]
   type = "service"
 
   group "postgres" {
@@ -8,7 +8,7 @@ job "boundary-postgres" {
 
 network {
         mode = "bridge"
-        port "db" { 
+        port "db" {
           static = 5432
            }
      }
@@ -21,9 +21,9 @@ network {
 
       }
       env {
-          POSTGRES_USER="root",
-          POSTGRES_PASSWORD="rootpassword",
-          POSTGRES_DB="boundary",
+          POSTGRES_USER="root"
+          POSTGRES_PASSWORD="rootpassword"
+          POSTGRES_DB="boundary"
       }
 
       logs {
@@ -35,7 +35,7 @@ network {
         cpu = 1000
         memory = 1024
       }
-  
+
       service {
         name = "boundary-postgres"
         tags = ["postgres for boundary"]

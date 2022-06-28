@@ -1,9 +1,20 @@
+variable "boundary_version" {
+  type = string
+  default = "0.9.0"
+}
+
+variable "boundary_checksum" {
+  type = string
+  default = "e97c8b93e23326c5cd0cf0a65cc79790d80dcafd175d577175698b0c091da992"
+}
+
 job "boundary-controller" {
  region = "global"
-  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2"]
   type = "service"
+
   group "boundary-controller" {
-    count = 1
+       count = 1
      network {
           port  "ui"  {
             static = 9200
@@ -18,21 +29,24 @@ job "boundary-controller" {
         vault {
       policies = ["superuser"]
     }
+##############################################################################################
          task "boundary.init" {
          lifecycle {
         hook    = "prestart"
       }
       driver = "raw_exec"
+       env {
+        VAULT_NAMESPACE = "boundary"
+      }
       resources {
         cpu = 512
         memory = 512
       }
       artifact {
-        source     = "https://releases.hashicorp.com/boundary/0.6.2/boundary_0.6.2_linux_amd64.zip"
-        # source      = "https://releases.hashicorp.com/boundary/0.1.1/boundary_0.1.1_${attr.kernel.name}_${attr.cpu.arch}.zip"
-        destination = "tmp/"
+         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
+        destination = "./tmp/"
         options {
-          checksum = "sha256:42a7c865c5970e311a9222629bbbdeaec6e7ea315f7e843793dd3cc1b84db240"
+          checksum = "sha256:${var.boundary_checksum}"
         }
       }
       template {
@@ -76,8 +90,8 @@ kms "transit" {
 
   // Key configuration
   key_name           = "root"
+  namespace          = "boundary"
   mount_path         = "transit/"
-  namespace          = "boundary/"
 
 }
 
@@ -88,8 +102,8 @@ kms "transit" {
 
   // Key configuration
   key_name           = "worker-auth"
+  namespace          = "boundary"
   mount_path         = "transit/"
-  namespace          = "boundary/"
 
 }
 
@@ -121,7 +135,7 @@ TEMPLATEEOF
       args    = ["init.sh"]
       }
     }
-
+############################################################################################
     task "boundary.service" {
       driver = "raw_exec"
   lifecycle {
@@ -131,16 +145,19 @@ TEMPLATEEOF
         attribute = "${meta.type}"
         value     = "server"
       }
+      env {
+        VAULT_NAMESPACE = "boundary"
+      }
       resources {
         cpu = 2000
         memory = 1024
 
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/0.6.2/boundary_0.6.2_linux_amd64.zip"
+         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
         destination = "./tmp/"
         options {
-          checksum = "sha256:42a7c865c5970e311a9222629bbbdeaec6e7ea315f7e843793dd3cc1b84db240"
+          checksum = "sha256:${var.boundary_checksum}"
         }
       }
       template {
@@ -179,9 +196,8 @@ kms "transit" {
 
   // Key configuration
   key_name           = "root"
+  namespace          = "boundary"
   mount_path         = "transit/"
-  namespace          = "boundary/"
-
 }
 
 kms "transit" {
@@ -191,9 +207,8 @@ kms "transit" {
 
   // Key configuration
   key_name           = "worker-auth"
+  namespace          = "boundary"
   mount_path         = "transit/"
-  namespace          = "boundary/"
-
 }
 
 
@@ -221,11 +236,4 @@ kms "transit" {
 
   }
 
-  update {
-    max_parallel = 1
-    min_healthy_time = "5s"
-    healthy_deadline = "3m"
-    auto_revert = false
-    canary = 0
-  }
 }

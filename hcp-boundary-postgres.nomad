@@ -8,7 +8,7 @@ job "boundary-postgres" {
 
 network {
         mode = "bridge"
-        port "db" { 
+        port "db" {
           static = 5432
            }
      }
@@ -35,9 +35,9 @@ network {
         cpu = 1000
         memory = 1024
       }
-  
+
       service {
-        name = "boundary-postgres"
+        name = "hcp-boundary-postgres"
         tags = ["postgres for boundary"]
         port = "db"
 
