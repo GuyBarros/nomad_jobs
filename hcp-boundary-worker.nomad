@@ -1,16 +1,26 @@
+#### to run: nomad job run  -var="hcp_boundary_cluster_id=0fcfa413-3d03-4ba3-89f4-389be0a7e252" hcp-boundary-worker.nomad
+
+
 variable "boundary_version" {
   type = string
-  default = "0.9.0"
+  default = "0.11.0+hcp"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "e97c8b93e23326c5cd0cf0a65cc79790d80dcafd175d577175698b0c091da992"
+  default = "cde09452d5d129c56e03f4f495f87ab0586005b31aba53fd8501b8b02199d6c3"
+
 }
+
+variable "hcp_boundary_cluster_id" {
+  type = string
+  
+}
+
 
 job "boundary-worker" {
  region = "global"
-  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   type = "service"
 
   group "boundary-worker" {
@@ -21,26 +31,12 @@ job "boundary-worker" {
         value = "true"
       }
     network {
-           port  "api"  {
-            static = 9200
-          }
-           port  "cluster"  {
-            static = 9201
-          }
           port  "worker"  {
             static = 9202
           }
         }
-        vault {
-      policies = ["superuser"]
-    }
     task "boundary-worker.service" {
       driver = "raw_exec"
-
-     constraint {
-        attribute = "${meta.type}"
-        value     = "server"
-      }
 
       resources {
         cpu = 2000
@@ -48,7 +44,7 @@ job "boundary-worker" {
 
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
+         source     = "https://releases.hashicorp.com/boundary-worker/${var.boundary_version}/boundary-worker_${var.boundary_version}_linux_amd64.zip"
         destination = "./tmp/"
         options {
           checksum = "sha256:${var.boundary_checksum}"
@@ -56,45 +52,38 @@ job "boundary-worker" {
       }
       template {
         data        = <<EOF
-        listener "tcp" {
-    purpose = "proxy"
-    address = "{{ env  "attr.unique.network.ip-address" }}:9202"
-    tls_disable = true
+        disable_mlock = true
+
+    hcp_boundary_cluster_id = "${var.hcp_boundary_cluster_id}"
+
+listener "tcp" {
+  address = "0.0.0.0:9202"
+  purpose = "proxy"
+     tls_disable = true
 }
+ 
+
 
 worker {
-  name = "local-worker-{{ env "NOMAD_ALLOC_INDEX" }}"
-  description = "Worker on {{ env "attr.unique.hostname" }}"
+  auth_storage_path = "tmp/boundary.d/"
    public_addr = "{{ env "attr.unique.platform.aws.public-ipv4" }}"
-   controllers = [
-     {{ range service "boundary-controller" }}
-        "{{ .Address }}:9201",
-     {{ end }}
-  ]
+     tags {
+    type      = ["workers","hcp","demostack"]
+  }
 
 }
-kms "transit" {
-  purpose            = "worker-auth"
-  address            = "https://vault.service.consul:8200"
-  disable_renewal    = "true"
 
-  // Key configuration
-  key_name           = "worker-auth"
-  mount_path         = "transit/"
-  namespace          = "boundary/"
-
-}
 
         EOF
-        destination = "./tmp/boundary.d/config.hcl"
+        destination = "./tmp/boundary.d/pki-worker.hcl"
       }
       config {
-        command = "/tmp/boundary"
-        args = ["server", "-config=tmp/boundary.d/config.hcl"]
+        command = "/tmp/boundary-worker"
+        args = ["server", "-config=tmp/boundary.d/pki-worker.hcl"]
       }
       service {
-        name = "boundary-worker"
-        tags = ["boundary-worker","worker-${NOMAD_ALLOC_INDEX}"]
+        name = "hcp-boundary-worker"
+        tags = ["hcp","boundary-worker","worker-${NOMAD_ALLOC_INDEX}"]
         port = "worker"
 
         check {
