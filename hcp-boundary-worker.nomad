@@ -66,6 +66,7 @@ listener "tcp" {
 
 worker {
   auth_storage_path = "tmp/boundary.d/"
+  # change this to the public ip address of the specific platform you are running or use "attr.unique.network.ip-address"
    public_addr = "{{ env "attr.unique.platform.aws.public-ipv4" }}"
      tags {
     type      = ["workers","hcp","demostack"]
