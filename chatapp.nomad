@@ -23,8 +23,8 @@ job "chat-app" {
         image = "lhaig/anon-app:light-0.03"
       }
       env {
-        "MONGODB_SERVER" = "127.0.0.1"
-        "MONGODB_PORT" = "27017"
+        MONGODB_SERVER = "127.0.0.1"
+        MONGODB_PORT = "27017"
       }
       resources {
         cpu = 300 # MHz

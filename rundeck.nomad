@@ -4,16 +4,15 @@ job "pipelines" {
   datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1"]
   group "ansible" {
     count = 1
-
+network {
+          port  "http"  {
+            to = 4440   
+          }
+        }
     task "rundeck" {
       driver = "docker"
       config {
         image = "phatbrasil/rundeck"
-
-        port_map {
-          
-          http = 4440
-        }
       }
 
       logs {
@@ -23,13 +22,7 @@ job "pipelines" {
       resources {
         cpu = 1000
         memory = 1024
-        network {
-          mbits = 10
-          
-          port  "http"  {
-            
-          }
-        }
+        
       }
       service {
         name = "rundeck"
@@ -38,6 +31,7 @@ job "pipelines" {
 
         check {
           name     = "alive"
+          port = "http"
           type     = "tcp"
           interval = "10s"
           timeout  = "2s"

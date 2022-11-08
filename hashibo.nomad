@@ -1,47 +1,44 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "presentation" {
-  datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   type = "service"
 
   group "presentation" {
     count = 3
-
+ network {
+        port "http" {
+         to = 80
+        }
+      }
     task "hashibo" {
       driver = "docker"
       config {
         image = "boeroboy/hashibo:2019"
-
-        port_map {
-          http = 80
-        }
+        ports = ["http"]
       }
 
       logs {
         max_files     = 5
         max_file_size = 15
       }
-      resources {
-        cpu = 1000
-        memory = 1024
-        network {
-          mbits = 10
-          port  "http"  {
-            
-          }
-        }
-      }
+  
       service {
         name = "hashibo"
-        tags = ["urlprefix-/hashibo strip=/hashibo"]
+        tags = [
+          "urlprefix-/hashibo strip=/hashibo",
+          "traefik.enable=true",
+          "traefik.http.routers.hashibo.rule=PathPrefix(`/hashibo`)",
+          "traefik.http.middlewares.hashibo.stripprefix.prefixes=/hashibo"
+        ]
         port = "http"
-
         check {
-          name     = "alive"
-          type     = "tcp"
-          interval = "10s"
-          timeout  = "2s"
-        }
+        type     = "http"
+        port     = "http"
+        path     = "/#/"
+        interval = "10s"
+        timeout  = "2s"
+       }
       }
     }
     restart {

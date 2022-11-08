@@ -1,6 +1,6 @@
 
 job "Consul-Resolvers" {
- datacenters = ["eu-west-2","eu-west-1","eu-west-3","ukwest","sa-east-1","ap-northeast-1","dc1","europe-west3-dc"]
+ datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   type = "batch"
   task "resolver-for-countapi" {
 

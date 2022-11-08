@@ -1,5 +1,5 @@
 job "chat2" {
- datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1","dev-eu-west-2", "DC1"]
+ datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
 
   type = "service"
   group "anon_chat" {
@@ -27,8 +27,8 @@ job "chat2" {
         destination = "local/repo/1/"
       }
       env{
-        "MONGODB_SERVER" = "127.0.0.1"
-        "MONGODB_PORT" =   27017
+        MONGODB_SERVER = "127.0.0.1"
+        MONGODB_PORT =   27017
       }
       config {
         command = "bash"

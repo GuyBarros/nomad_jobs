@@ -1,21 +1,19 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "jupyterhub" {
-    region = "europe-west3"
-  datacenters = ["primarystack"]
-
+    datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
 
   group "jupyterhub" {
     count = 1
-
+network {
+          port  "http"  {
+            to = 8000   
+          }
+        }
     task "jupyterhub" {
       driver = "docker"
       config {
         image = "jupyterhub/jupyterhub"
-
-        port_map {
-          http = 8000
-        }
       }
 
       logs {
@@ -25,12 +23,6 @@ job "jupyterhub" {
       resources {
         cpu = 1000
         memory = 1024
-        network {
-          mbits = 10
-          port  "http"  {
-            
-          }
-        }
       }
       service {
         name = "jupyterhub"
@@ -39,6 +31,7 @@ job "jupyterhub" {
 
         check {
           name     = "alive"
+          port = "http"
           type     = "tcp"
           interval = "10s"
           timeout  = "2s"
@@ -53,8 +46,6 @@ job "jupyterhub" {
     }
 
   }
-
-  
   
   update {
     max_parallel = 1

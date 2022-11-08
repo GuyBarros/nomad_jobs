@@ -1,5 +1,5 @@
 job "countdash" {
-   datacenters = ["dc1"]
+   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
    group "api" {
      network {
        mode = "bridge"

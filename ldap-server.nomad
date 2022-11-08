@@ -1,5 +1,5 @@
 job "LDAP" {
-  datacenters = ["eu-west-2","eu-west-1","ukwest","sa-east-1","ap-northeast-1","dc1"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   type = "service"
 
   group "openldap" {
@@ -10,16 +10,17 @@ job "LDAP" {
       delay = "25s"
       mode = "delay"
     }
-
+network {
+          port  "LDAP"  {
+            static = 389
+          }
+        }
     task "ldap-service" {
       driver = "docker"
       config {
         image = "osixia/openldap"
         network_mode = "host"
-        port_map {
-          LDAP = 389
-        }
-
+        
         volumes = [
           "local:/container/service/slapd/assets/config/bootstrap/ldif/custom"
         ]
@@ -38,12 +39,7 @@ job "LDAP" {
       resources {
         cpu = 1000
         memory = 1024
-        network {
-          mbits = 10
-          port  "LDAP"  {
-            static = 389
-          }
-        }
+        
       }
       service {
         name = "ldap-service"

@@ -1,23 +1,19 @@
 job "jupyter" {
-    region = "europe-west3"
-  datacenters = ["primarystack"]
-
+    datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
 
   group "jupyter-notebook" {
     count = 1
-
+   network {
+          port  "http"  {
+            to = 8888
+          }
+        }
     task "scipy" {
-         constraint {
-        attribute = "${meta.type}"
-        value     = "server"
-      }
+       
       driver = "docker"
       config {
         image = "jupyter/scipy-notebook"
-
-        port_map {
-          http = 8888
-        }
+        ports = ["http"]
       }
 
       logs {
@@ -27,25 +23,8 @@ job "jupyter" {
       resources {
         cpu = 1000
         memory = 1024
-        network {
-          mbits = 10
-          port  "http"  {
-            
-          }
-        }
       }
-      service {
-        name = "jupyter-scipy"
-        tags = ["urlprefix-/jupyter-scipy strip=/jupyter-scipy"]
-        port = "http"
-
-        check {
-          name     = "alive"
-          type     = "tcp"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
+      
     }
     restart {
       attempts = 10
@@ -53,16 +32,18 @@ job "jupyter" {
       delay = "25s"
       mode = "delay"
     }
+   service {
+        name = "jupyter-scipy"
+        tags = ["urlprefix-/jupyter-scipy strip=/jupyter-scipy"]
+        port = "http"
 
-  }
-
-  
-  
-  update {
-    max_parallel = 1
-    min_healthy_time = "5s"
-    healthy_deadline = "3m"
-    auto_revert = false
-    canary = 0
+        check {
+          name     = "alive"
+          port = "http"
+          type     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
+        }
+     }
   }
 }

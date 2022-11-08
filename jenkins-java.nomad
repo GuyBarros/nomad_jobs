@@ -1,15 +1,15 @@
 job "jenkins" {
   type = "service"
-   datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1"]
+   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
     update {
       stagger      = "30s"
         max_parallel = 1
     }
-#  constraint {
-#    attribute = "${driver.java.version}"
-#    operator  = ">"
-#    value     = "1.7.0"
-#  }
+ #  constraint {
+ #    attribute = "${driver.java.version}"
+ #    operator  = ">"
+ #    value     = "1.7.0"
+ #  }
   group "web" {
     count = 1
       # Size of the ephemeral storage for Jenkins. Consider that depending
@@ -17,9 +17,16 @@ job "jenkins" {
       ephemeral_disk {
        migrate = true
        size    = "500"
-       sticky  = true
-       
+       sticky  = true 
      }
+     network {
+            port "http" {
+                
+            }
+            port "slave" {
+              
+            }
+          }
     task "frontend" {
       env {
         # Use ephemeral storage for Jenkins data.
@@ -45,28 +52,14 @@ job "jenkins" {
         # labeled "http".
         port = "http"
         name = "jenkins"
-
         check {
           type     = "http"
           path     = "/login"
           interval = "10s"
           timeout  = "2s"
-        }
-    }
+         }
+       }
+       }#task
+       }#group
 
-      resources {
-          cpu    = 2400 # MHz
-          memory = 1024 # MB
-          network {
-            mbits = 100
-            port "http" {
-                
-            }
-            port "slave" {
-              
-            }
-          }
-        }
-      }
     }
-}

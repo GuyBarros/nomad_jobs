@@ -1,23 +1,27 @@
 job "mongodb" {
-  datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
    type = "service"
     group "db" {
          count = 1
-           volume "mongodb_vol" {
-      type = "host"
-        source = "mongodb_mount"
-    }
+#           volume "mongodb_vol" {
+#      type = "host"
+#        source = "mongodb_mount"
+#    }
      network {
                     mode = "bridge"
+                    port "db"{
+                      static = 27017
+                    }
                 }
     task "mongodb" {
             driver = "docker"
-            volume_mount {
-                volume      = "mongodb_vol"
-                destination = "/data/db"
-               }
+#            volume_mount {
+#                volume      = "mongodb_vol"
+#                destination = "/data/db"
+#               }
             config {
                 image = "mongo"
+                ports = ["db"]
             }
 
             logs {
@@ -33,7 +37,7 @@ job "mongodb" {
          service {
                 name = "mongodb"
                 tags = ["mongodb"]
-                port = "27017"
+                port = "db"
                  connect {
      sidecar_service {}
    }
@@ -52,8 +56,8 @@ job "mongodb" {
     task "mongo-express" {
             driver = "docker"
             env {
-                "ME_CONFIG_MONGODB_SERVER" = "127.0.0.1"
-                "ME_CONFIG_MONGODB_PORT" = "27017"
+                ME_CONFIG_MONGODB_SERVER = "127.0.0.1"
+                ME_CONFIG_MONGODB_PORT = "27017"
             }
             config {
                 image = "mongo-express"

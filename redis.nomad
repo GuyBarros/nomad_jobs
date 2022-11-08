@@ -1,6 +1,6 @@
 
 job "redis" {
-  datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1","europe-west3-dc"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   
   type = "service"
 
@@ -26,38 +26,34 @@ job "redis" {
       size = 300
     }
 
+network {
+          mode = "bridge"
+          port "db" {
+            to = 6379
+          }
+        }
+
     task "redis" {
       driver = "docker"
       config {
         image = "redis"
-        port_map {
-          db = 6379
-        }
+        ports = ["db"]
+        
       }
 
       resources {
         cpu    = 500 # 500 MHz
         memory = 256 # 256MB
-        network {
-          mbits = 10
-          port "db" {}
-        }
+        
       }
-
-      service {
+    }
+    service {
         name = "redis"
         tags = ["global", "cache", "urlprefix-/redis" ]
         port = "db"
         connect {
              sidecar_service {}
         }
-        check {
-          name     = "alive"
-          type     = "tcp"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
-    }
   }
 }

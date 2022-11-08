@@ -1,5 +1,5 @@
 job "chat-app" {
-  datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1","dc1-eu-west-2"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   type = "service"
   group "chat-app" {
     count = 3
@@ -23,8 +23,8 @@ job "chat-app" {
         image = "lhaig/anon-app:dark-0.03"
       }
       env {
-        "MONGODB_SERVER" = "127.0.0.1"
-        "MONGODB_PORT" = "27017"
+        MONGODB_SERVER = "127.0.0.1"
+        MONGODB_PORT = "27017"
       }
       resources {
         cpu = 300 # MHz

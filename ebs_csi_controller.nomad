@@ -1,6 +1,6 @@
 job "plugin-aws-ebs-controller" {
  region = "global"
-  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","dc1"]
 
   group "controller" {
     task "plugin" {

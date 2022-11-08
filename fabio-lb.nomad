@@ -1,6 +1,6 @@
 job "fabio" {
   region = "global"
-  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   type     = "system"
   priority = 75
 
@@ -8,6 +8,19 @@ job "fabio" {
     stagger      = "10s"
     max_parallel = 1
   }
+
+  group "fabio-lb"{
+
+      network {
+
+        port "http" {
+          static = 9999
+        }
+
+        port "ui" {
+          static = 9998
+        }
+      }
 
   task "fabio" {
     driver = "exec"
@@ -17,7 +30,7 @@ job "fabio" {
     }
 
     artifact {
-      source      = "https://github.com/fabiolb/fabio/releases/download/v1.5.13/fabio-1.5.13-go1.13.4-linux_amd64"
+      source      = "https://github.com/fabiolb/fabio/releases/download/v1.6.2/fabio-1.6.2-linux_amd64"
       destination = "fabio"
       mode        = "file"
     }
@@ -35,18 +48,6 @@ job "fabio" {
       }
     }
 
-    resources {
-
-      network {
-
-        port "http" {
-          static = 9999
-        }
-
-        port "ui" {
-          static = 9998
-        }
-      }
-    }
+  }
   }
 }

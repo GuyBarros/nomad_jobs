@@ -1,16 +1,22 @@
 # For full documentation and examples, see
 #     https://www.nomadproject.io/docs/job-specification/job.html
 job "hashicorp" {
-  datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1"]
+  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   type = "service"
 
   group "consul" {
     count = 1
 
+network {
+      mode = "bridge"
+      port "http" {
+        to = 8500
+      }
+    }
     task "consul-enterprise" {
       driver = "docker"
       config {
-        image = "hashicorp/consul-enterprise:1.4.3-ent"
+        image = "hashicorp/consul-enterprise"
 
         port_map {
           http = 8500
@@ -21,14 +27,7 @@ job "hashicorp" {
         max_files     = 5
         max_file_size = 35
       }
-      resources {
-          
-        network {
-          port  "http"  {
-            static = 8500
-          }
-        }
-      }
+      
       service {
         name = "consul-docker"
         tags = ["urlprefix-/consul-docker strip=/consul-docker"]

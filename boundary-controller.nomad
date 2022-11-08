@@ -1,11 +1,11 @@
 variable "boundary_version" {
   type = string
-  default = "0.9.0"
+  default = "0.11.0"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "e97c8b93e23326c5cd0cf0a65cc79790d80dcafd175d577175698b0c091da992"
+  default = "0eb60ba3b945415d13124cbb1639e038e120a9aa1ca8dc8bc229cdd58abc4988"
 }
 
 job "boundary-controller" {

@@ -1,16 +1,26 @@
 job "traefik" {
   region      = "global"
-datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
+datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   type        = "system"
 
   group "traefik" {
     count = 1
+ network {
+      mode = "host"
+      
+        port "http" {
+            static = 8080
+          }
 
+          port "api" {
+            static = 8081
+          }
+    }
     task "traefik" {
       driver = "docker"
 
       config {
-        image        = "traefik:v2.2"
+        image        = "traefik"
         network_mode = "host"
 
         volumes = [
@@ -48,33 +58,17 @@ EOF
         destination = "local/traefik.toml"
       }
 
-      resources {
-        cpu    = 100
-        memory = 128
-
-        network {
-          mbits = 10
-
-          port "http" {
-            static = 8080
-          }
-
-          port "api" {
-            static = 8081
-          }
-        }
-      }
 
       service {
         name = "traefik"
-
+        port = "http"
         check {
-          name     = "alive"
-          type     = "tcp"
-          port     = "http"
-          interval = "10s"
-          timeout  = "2s"
-        }
+        type     = "http"
+        port     = "api"
+        path     = "/ping"
+        interval = "10s"
+        timeout  = "2s"
+      }
       }
     }
   }

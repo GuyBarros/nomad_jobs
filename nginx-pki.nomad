@@ -8,18 +8,22 @@ job "nginx" {
     vault {
       policies = ["superuser"]
     }
+ network {
+    port "http" {
+        to = 80
+    }
+    port "https" {
+        to = 443
+    }
+  }
 
     task "nginx-pki" {
       driver = "docker"
 
       config {
         image = "nginx"
-        port_map {
-          http = 80
-        }
-        port_map {
-          https = 443
-        }
+         ports = ["http", "https"]
+        
         volumes = [
           "custom/default.conf:/etc/nginx/conf.d/default.conf",
           "secret/cert.key:/etc/nginx/ssl/nginx.key",
@@ -90,15 +94,7 @@ job "nginx" {
       resources {
         cpu    = 100 # 100 MHz
         memory = 128 # 128 MB
-        network {
-          mbits = 10
-          port "http" {
-
-          }
-          port "https" {
-
-          }
-        }
+        
       }
 
       service {
