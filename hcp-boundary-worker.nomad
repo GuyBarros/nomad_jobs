@@ -1,14 +1,14 @@
-#### to run: nomad job run  -var="hcp_boundary_cluster_id=0fcfa413-3d03-4ba3-89f4-389be0a7e252" hcp-boundary-worker.nomad
+#### to run: nomad job run  -var="hcp_boundary_cluster_id=d5361f89-df3a-4a64-8e63-5f9ab51ac787" hcp-boundary-worker.nomad
 
 
 variable "boundary_version" {
   type = string
-  default = "0.11.0+hcp"
+  default = "0.12.0+hcp"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "cde09452d5d129c56e03f4f495f87ab0586005b31aba53fd8501b8b02199d6c3"
+  default = "235625bc96d9bcb35ca0309c43070af0d3b7ce3a44f249329db0286c36a50eee"
 
 }
 
