@@ -21,7 +21,7 @@ job "postgres" {
 
       }
       env {
-          POSTGRES_USER="root",
+          POSTGRES_USER="root"
           POSTGRES_PASSWORD="rootpassword"
       }
 
