@@ -1,11 +1,11 @@
 variable "boundary_version" {
   type = string
-  default = "0.12.0"
+  default = "0.12.2"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "f74bbbb7ae86b02caf6033502ab77d1fbc0ea38c4d0351ccb56894385269eee3"
+  default = "7c3db27111d8622061b1fc667ab4b1bb0d6af04f8a8ae3e0f6dfd58dfb086d41"
 }
 
 job "boundary-worker" {
@@ -87,6 +87,35 @@ kms "transit" {
   namespace          = "boundary"
 
 }
+
+events {
+  audit_enabled       = true
+  sysevents_enabled   = true
+  observations_enable = true
+  sink "stderr" {
+    name = "all-events"
+    description = "All events sent to stderr"
+    event_types = ["*"]
+    format = "cloudevents-json"
+  }
+  sink {
+    name = "file-sink"
+    description = "All events sent to a file"
+    event_types = ["*"]
+    format = "cloudevents-json"
+    file {
+      path = "/var/log/boundary"
+      file_name = "egress-worker.log"
+    }
+    audit_config {
+      audit_filter_overrides {
+        sensitive = "redact"
+        secret    = "redact"
+      }
+    }
+  }
+}
+
 
         EOF
         destination = "./tmp/boundary.d/config.hcl"

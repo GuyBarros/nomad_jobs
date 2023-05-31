@@ -1,6 +1,3 @@
-#### to run: nomad job run  -var="hcp_boundary_cluster_id=d5361f89-df3a-4a64-8e63-5f9ab51ac787" hcp-boundary-worker.nomad
-
-
 variable "boundary_version" {
   type = string
   default = "0.12.3+hcp"
@@ -12,13 +9,8 @@ variable "boundary_checksum" {
 
 }
 
-variable "hcp_boundary_cluster_id" {
-  type = string
-  
-}
 
-
-job "boundary-worker" {
+job "boundary-ingress-worker" {
  region = "global"
   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   type = "service"
@@ -35,7 +27,7 @@ job "boundary-worker" {
             static = 9202
           }
         }
-    task "boundary-worker.service" {
+    task "boundary-ingress-worker.service" {
       driver = "raw_exec"
 
       resources {
@@ -54,7 +46,6 @@ job "boundary-worker" {
         data        = <<EOF
         disable_mlock = true
 
-    hcp_boundary_cluster_id = "${var.hcp_boundary_cluster_id}"
 
 listener "tcp" {
   address = "0.0.0.0:9202"
@@ -68,8 +59,13 @@ worker {
   auth_storage_path = "tmp/boundary.d/"
   # change this to the public ip address of the specific platform you are running or use "attr.unique.network.ip-address"
    public_addr = "{{ env "attr.unique.platform.aws.public-ipv4" }}"
+   initial_upstreams = [
+     {{ range service "boundary-controller" }}
+        "{{ .Address }}:9201",
+     {{ end }}
+  ]
      tags {
-    type      = ["workers","hcp","demostack"]
+    type      = ["workers","hcp","demostack","ingress"]
   }
 
 }
@@ -110,8 +106,8 @@ events {
         args = ["server", "-config=tmp/boundary.d/pki-worker.hcl"]
       }
       service {
-        name = "hcp-boundary-worker"
-        tags = ["hcp","boundary-worker","worker-${NOMAD_ALLOC_INDEX}"]
+        name = "boundary-ingress-worker"
+        tags = ["boundary-ingress-worker","worker-${NOMAD_ALLOC_INDEX}"]
         port = "worker"
 
         check {

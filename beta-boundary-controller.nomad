@@ -1,11 +1,16 @@
 variable "boundary_version" {
   type = string
-  default = "0.12.2"
+  default = "0.12.3+hcp"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "7c3db27111d8622061b1fc667ab4b1bb0d6af04f8a8ae3e0f6dfd58dfb086d41"
+  default = "f86d4520c279701c88a943a863779d2284514d38b2bfd36f218ab3464fadfa63"
+}
+
+variable "beta_license" {
+  type = string
+  default = ""
 }
 
 job "boundary-controller" {
@@ -43,7 +48,7 @@ job "boundary-controller" {
         memory = 512
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
+         source     = "https://releases.hashicorp.com/boundary-worker/${var.boundary_version}/boundary-worker_${var.boundary_version}_linux_amd64.zip"
         destination = "./tmp/"
         options {
           checksum = "sha256:${var.boundary_checksum}"
@@ -81,6 +86,8 @@ controller {
   database {
     url = "postgresql://root:rootpassword@boundary-postgres.service.consul:5432/boundary?sslmode=disable"
   }
+
+  license = "${var.beta_license}"
 }
 
 kms "transit" {
@@ -107,10 +114,40 @@ kms "transit" {
 
 }
 
+events {
+  audit_enabled       = true
+  sysevents_enabled   = true
+  observations_enable = true
+  sink "stderr" {
+    name = "all-events"
+    description = "All events sent to stderr"
+    event_types = ["*"]
+    format = "cloudevents-json"
+  }
+  sink {
+    name = "file-sink"
+    description = "All events sent to a file"
+    event_types = ["*"]
+    format = "cloudevents-json"
+    file {
+      path = "/var/log/boundary"
+      file_name = "controller.log"
+    }
+    audit_config {
+      audit_filter_overrides {
+        sensitive = "redact"
+        secret    = "redact"
+      }
+    }
+  }
+}
+
+
+
 EOF
 
 echo "--> running boundary init"
-tmp/boundary database init -format=json -config=tmp/config.hcl >> init.txt
+tmp/boundary-worker database init -format=json -config=tmp/config.hcl >> init.txt
 
 echo "--> init output"
 cat init.txt
@@ -154,7 +191,7 @@ TEMPLATEEOF
 
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
+         source     = "https://releases.hashicorp.com/boundary-worker/${var.boundary_version}/boundary-worker_${var.boundary_version}_linux_amd64.zip"
         destination = "./tmp/"
         options {
           checksum = "sha256:${var.boundary_checksum}"
@@ -187,6 +224,7 @@ controller {
   database {
     url = "postgresql://root:rootpassword@boundary-postgres.service.consul:5432/boundary?sslmode=disable"
   }
+  license = "${var.beta_license}"
 }
 
 kms "transit" {
@@ -211,42 +249,13 @@ kms "transit" {
   mount_path         = "transit/"
 }
 
-events {
-  audit_enabled       = true
-  sysevents_enabled   = true
-  observations_enable = true
-  sink "stderr" {
-    name = "all-events"
-    description = "All events sent to stderr"
-    event_types = ["*"]
-    format = "cloudevents-json"
-  }
-  sink {
-    name = "file-sink"
-    description = "All events sent to a file"
-    event_types = ["*"]
-    format = "cloudevents-json"
-    file {
-      path = "/var/log/boundary"
-      file_name = "controller.log"
-    }
-    audit_config {
-      audit_filter_overrides {
-        sensitive = "redact"
-        secret    = "redact"
-      }
-    }
-  }
-}
-
-
 
 
         EOF
         destination = "tmp/config.hcl"
       }
       config {
-        command = "/tmp/boundary"
+        command = "/tmp/boundary-worker"
         args = ["server", "-config=tmp/config.hcl"]
       }
       service {
