@@ -1,7 +1,7 @@
 variable "datacenters" {
   description = "A list of datacenters in the region which are eligible for task placement."
   type        = list(string)
-  default     = ["dc1"]
+  default     = ["eu-west"]
 }
 
 variable "region" {
@@ -129,6 +129,7 @@ job "hashicups" {
         image   = "hashicorpdemoapp/product-api:${var.product_api_version}"
         ports = ["product-api"]
       }
+      
       env {
         DB_CONNECTION = "host=${NOMAD_IP_db} port=${NOMAD_PORT_db} user=${var.postgres_user} password=${var.postgres_password} dbname=${var.postgres_db} sslmode=disable"
         BIND_ADDRESS = "0.0.0.0:${NOMAD_PORT_product-api}"
@@ -137,6 +138,10 @@ job "hashicups" {
 
     task "payments-api" {
       driver = "docker"
+      resources {
+       # cpu = 300 # MHz
+         memory = 512 # MB
+      }
       meta {
         service = "payments-api"
       }
@@ -148,6 +153,7 @@ job "hashicups" {
           source = "local/application.properties"
           target = "/application.properties"
         }
+        
       }
       template {
         data = "server.port=${var.payments_api_port}"
@@ -164,6 +170,7 @@ job "hashicups" {
         image   = "hashicorpdemoapp/public-api:${var.public_api_version}"
         ports = ["public-api"]
       }
+      
       env {
         BIND_ADDRESS = ":${NOMAD_PORT_public-api}"
         PRODUCT_API_URI = "http://${NOMAD_ADDR_product-api}"
