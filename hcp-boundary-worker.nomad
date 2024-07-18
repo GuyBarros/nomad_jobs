@@ -3,7 +3,7 @@
 
 variable "boundary_version" {
   type = string
-  default = "0.12.3+hcp"
+  default = "0.13.0+ent"
 }
 
 variable "boundary_checksum" {
@@ -44,10 +44,10 @@ job "boundary-worker" {
 
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary-worker/${var.boundary_version}/boundary-worker_${var.boundary_version}_linux_amd64.zip"
+        source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
         destination = "./tmp/"
         options {
-          checksum = "sha256:${var.boundary_checksum}"
+        #  checksum = "sha256:${var.boundary_checksum}"
         }
       }
       template {
@@ -67,7 +67,8 @@ listener "tcp" {
 worker {
   auth_storage_path = "tmp/boundary.d/"
   # change this to the public ip address of the specific platform you are running or use "attr.unique.network.ip-address"
-   public_addr = "{{ env "attr.unique.platform.aws.public-ipv4" }}"
+   #public_addr = "{{ env "attr.unique.platform.aws.public-ipv4" }}"
+public_addr = "82.42.64.54"
      tags {
     type      = ["workers","hcp","demostack"]
   }
@@ -106,7 +107,7 @@ events {
         destination = "./tmp/boundary.d/pki-worker.hcl"
       }
       config {
-        command = "/tmp/boundary-worker"
+        command = "/tmp/boundary"
         args = ["server", "-config=tmp/boundary.d/pki-worker.hcl"]
       }
       service {

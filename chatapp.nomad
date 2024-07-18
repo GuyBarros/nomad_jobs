@@ -1,9 +1,15 @@
+variable "consul_namespace"{
+  description = "which consul namespace you want to deploy this job to" 
+  default = "default"
+}
 job "chat-app" {
   datacenters = ["eu-west-2","ukwest","sa-east-1","ap-northeast-1","dc1","dc1-eu-west-2"]
   type = "service"
   group "chat-app" {
     count = 3
-
+consul{
+      namespace = var.consul_namespace
+    }
     update {
       max_parallel = 1
       health_check = "checks"
@@ -25,6 +31,7 @@ job "chat-app" {
       env {
         MONGODB_SERVER = "127.0.0.1"
         MONGODB_PORT = "27017"
+        CONSUL_HTTP_TOKEN="11a9a399-3f1d-b431-2a09-5e50e0ea3a02"
       }
       resources {
         cpu = 300 # MHz

@@ -30,7 +30,7 @@ job "fabio" {
     }
 
     artifact {
-      source      = "https://github.com/fabiolb/fabio/releases/download/v1.6.2/fabio-1.6.2-linux_amd64"
+      source      = "https://github.com/fabiolb/fabio/releases/download/v1.6.3/fabio-1.6.3-linux_amd64"
       destination = "fabio"
       mode        = "file"
     }

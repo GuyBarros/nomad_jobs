@@ -1,13 +1,17 @@
 variable "boundary_version" {
   type = string
-  default = "0.13.0"
+  default = "0.13.0+ent"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "7c3db27111d8622061b1fc667ab4b1bb0d6af04f8a8ae3e0f6dfd58dfb086d41"
+  default = "f86d4520c279701c88a943a863779d2284514d38b2bfd36f218ab3464fadfa63"
 }
 
+variable "enterprise_license" {
+  type = string
+  default = ""
+}
 job "boundary-controller" {
  region = "global"
   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2"]
@@ -37,6 +41,7 @@ job "boundary-controller" {
       driver = "raw_exec"
        env {
         VAULT_NAMESPACE = "boundary"
+        BOUNDARY_LICENSE = "${var.enterprise_license}"
       }
       resources {
         cpu = 512
@@ -107,6 +112,7 @@ kms "transit" {
 
 }
 
+
 EOF
 
 echo "--> running boundary init"
@@ -147,6 +153,7 @@ TEMPLATEEOF
       }
       env {
         VAULT_NAMESPACE = "boundary"
+        BOUNDARY_LICENSE = "${var.enterprise_license}"
       }
       resources {
         cpu = 2000
@@ -162,6 +169,8 @@ TEMPLATEEOF
       }
       template {
         data        = <<EOF
+
+
       listener "tcp" {
   address = "{{ env  "attr.unique.network.ip-address" }}:9200"
   # The purpose of this listener block
@@ -238,6 +247,7 @@ events {
     }
   }
 }
+
 
 
 

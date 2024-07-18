@@ -1,5 +1,5 @@
 job "nginx" {
-   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c"]
+   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2"]
   type = "service"
 
   group "withvault" {
@@ -7,6 +7,8 @@ job "nginx" {
 
     vault {
       policies = ["superuser"]
+      # namespace = "admin"
+      env = false
     }
  network {
     port "http" {

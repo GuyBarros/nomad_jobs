@@ -1,9 +1,17 @@
+variable "consul_namespace"{
+  description = "which consul namespace you want to deploy this job to" 
+  default = "default"
+}
+
 job "chat2" {
  datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
 
   type = "service"
   group "anon_chat" {
     count = 1
+    consul{
+      namespace = var.consul_namespace
+    }
     network {
       mode = "bridge"
       port "http" {
@@ -36,6 +44,7 @@ job "chat2" {
       }
     }
     service {
+      provider = "consul" 
       name = "chat"
       tags = ["chat"]
       port = "http"

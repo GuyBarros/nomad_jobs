@@ -1,6 +1,6 @@
 variable "boundary_version" {
   type = string
-  default = "0.12.3+hcp"
+  default = "0.13.0+ent"
 }
 
 variable "boundary_checksum" {

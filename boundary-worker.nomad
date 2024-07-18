@@ -1,6 +1,6 @@
 variable "boundary_version" {
   type = string
-  default = "0.12.2"
+  default = "0.13.0"
 }
 
 variable "boundary_checksum" {
@@ -50,7 +50,7 @@ job "boundary-worker" {
          source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
         destination = "./tmp/"
         options {
-          checksum = "sha256:${var.boundary_checksum}"
+         # checksum = "sha256:${var.boundary_checksum}"
         }
       }
       template {

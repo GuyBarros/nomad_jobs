@@ -9,6 +9,20 @@ variable "boundary_checksum" {
 
 }
 
+variable "boundary_auth_tokens" {
+  default = "neslat_2KrTaG72coHRjJmR9RsyyESJ9ShxpSRR4c5a3zMPYQACgFcrPGw8Ck5rmh3QuhdxTQp77n83BhBgVMw52FazwAGofiV6p"
+}
+
+variable "boundary_ingress_worker_count"{
+  type = number
+  default = 3
+}
+
+variable "initial_upstreams_address"{
+  type = string
+  default = "42e0c292-9833-4c5e-b9fa-67bb7a11182e.boundary.hashicorp.cloud"
+}
+
 
 job "boundary-ingress-worker" {
  region = "global"
@@ -16,7 +30,7 @@ job "boundary-ingress-worker" {
   type = "service"
 
   group "boundary-worker" {
-    count = 3
+    count = var.boundary_ingress_worker_count
 
       constraint {
         operator = "distinct_hosts"
@@ -36,7 +50,7 @@ job "boundary-ingress-worker" {
 
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
+        source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
         destination = "./tmp/"
         options {
           # checksum = "sha256:${var.boundary_checksum}"
@@ -47,30 +61,27 @@ job "boundary-ingress-worker" {
         disable_mlock = true
 
 
-listener "tcp" {
+ listener "tcp" {
   address = "0.0.0.0:9202"
   purpose = "proxy"
      tls_disable = true
-}
+ }
  
 
 
-worker {
+ worker {
   auth_storage_path = "tmp/boundary.d/"
   # change this to the public ip address of the specific platform you are running or use "attr.unique.network.ip-address"
    public_addr = "{{ env "attr.unique.platform.aws.public-ipv4" }}"
-   initial_upstreams = [
-     {{ range service "boundary-controller" }}
-        "{{ .Address }}:9201",
-     {{ end }}
+   initial_upstreams = [ "${var.initial_upstreams_address}"
   ]
      tags {
     type      = ["workers","ent","demostack","ingress"]
   }
+   controller_generated_activation_token = "${boundary_auth_token}"
+ }
 
-}
-
-events {
+ events {
   audit_enabled       = true
   sysevents_enabled   = true
   observations_enable = true
@@ -96,17 +107,18 @@ events {
       }
     }
   }
-}
+ }
 
         EOF
         destination = "./tmp/boundary.d/pki-worker.hcl"
       }
       config {
-        command = "/tmp/boundary-worker"
+        command = "/tmp/boundary"
         args = ["server", "-config=tmp/boundary.d/pki-worker.hcl"]
       }
       service {
         name = "boundary-ingress-worker"
+        address = "${attr.unique.platform.aws.public-ipv4}"
         tags = ["boundary-ingress-worker","worker-${NOMAD_ALLOC_INDEX}"]
         port = "worker"
 
