@@ -9,13 +9,13 @@ variable "boundary_checksum" {
 }
 
 
-job "boundary-ingress-worker" {
+job "boundary-mhop-worker" {
  region = "global"
   datacenters = ["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2","dc1"]
   type = "service"
 
-  group "boundary-worker" {
-    count = 2
+  group "boundary-mhop-worker" {
+    count = 1
 
       constraint {
         operator = "distinct_hosts"
@@ -55,22 +55,26 @@ job "boundary-ingress-worker" {
 listener "tcp" {
   address = "0.0.0.0:9202"
   purpose = "proxy"
-     tls_disable = true
 }
- 
+
+listener "tcp" {
+  address = "0.0.0.0:9201"
+  purpose = "proxy"
+}
+  
 
 
 worker {
   auth_storage_path = "tmp/boundary.d/"
   # change this to the public ip address of the specific platform you are running or use "attr.unique.network.ip-address"
-   public_addr = "{{ env "attr.unique.platform.aws.public-ipv4" }}"
-   initial_upstreams = [
-     {{ range service "boundary-controller" }}
-        "{{ .Address }}:9201",
+  # initial_upstreams = ["10.1.2.86:9202","10.1.2.148:9202"]
+  initial_upstreams = [
+     {{ range service "boundary-ingress-worker" }}
+        "{{ .Address }}:9202",
      {{ end }}
   ]
      tags {
-    type      = ["workers","ent","demostack","ingress","ingress-{{ env "node.unique.name" }}"]
+    type      = ["workers","ent","demostack","ingress","mhop-{{ env "node.unique.name" }}"]
   }
 
 }
@@ -111,15 +115,15 @@ events {
         args = ["server", "-config=tmp/boundary.d/pki-worker.hcl"]
       }
       service {
-        name = "boundary-ingress-worker"
-        tags = ["boundary-ingress-worker","worker-${NOMAD_ALLOC_INDEX}"]
+        name = "boundary-mhop-worker"
+        tags = ["boundary-mhop-worker","worker-${NOMAD_ALLOC_INDEX}"]
         port = "worker"
 
         check {
           name     = "alive"
           type     = "tcp"
-          interval = "10s"
-          timeout  = "2s"
+          interval = "30s"
+          timeout  = "5s"
         }
       }
     }
