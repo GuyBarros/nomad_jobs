@@ -1,14 +1,14 @@
 variable "boundary_version" {
   type = string
-  default = "0.13.0+ent"
+  default = "0.18.0+ent"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "f86d4520c279701c88a943a863779d2284514d38b2bfd36f218ab3464fadfa63"
+  default = "319c91a2137d8ffb9595aa801dedd19f806f868a577010e35b591a45eb13ff39"
 }
 
-variable "beta_license" {
+variable "ent_license" {
   type = string
   default = ""
 }
@@ -48,10 +48,10 @@ job "boundary-controller" {
         memory = 512
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary-worker/${var.boundary_version}/boundary-worker_${var.boundary_version}_linux_amd64.zip"
+         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_${attr.kernel.name}_${attr.cpu.arch}.zip"
         destination = "./tmp/"
         options {
-          checksum = "sha256:${var.boundary_checksum}"
+         # checksum = "sha256:${var.boundary_checksum}"
         }
       }
       template {
@@ -87,7 +87,7 @@ controller {
     url = "postgresql://root:rootpassword@boundary-postgres.service.consul:5432/boundary?sslmode=disable"
   }
 
-  license = "${var.beta_license}"
+  license = "${var.ent_license}"
 }
 
 kms "transit" {
@@ -147,7 +147,7 @@ events {
 EOF
 
 echo "--> running boundary init"
-tmp/boundary-worker database init -format=json -config=tmp/config.hcl >> init.txt
+tmp/boundary database init -format=json -config=tmp/config.hcl >> init.txt
 
 echo "--> init output"
 cat init.txt
@@ -191,10 +191,10 @@ TEMPLATEEOF
 
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary-worker/${var.boundary_version}/boundary-worker_${var.boundary_version}_linux_amd64.zip"
+        source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_${attr.kernel.name}_${attr.cpu.arch}.zip"
         destination = "./tmp/"
         options {
-          checksum = "sha256:${var.boundary_checksum}"
+          # checksum = "sha256:${var.boundary_checksum}"
         }
       }
       template {
@@ -224,7 +224,7 @@ controller {
   database {
     url = "postgresql://root:rootpassword@boundary-postgres.service.consul:5432/boundary?sslmode=disable"
   }
-  license = "${var.beta_license}"
+  license = "${var.ent_license}"
 }
 
 kms "transit" {
@@ -255,7 +255,7 @@ kms "transit" {
         destination = "tmp/config.hcl"
       }
       config {
-        command = "/tmp/boundary-worker"
+        command = "/tmp/boundary"
         args = ["server", "-config=tmp/config.hcl"]
       }
       service {

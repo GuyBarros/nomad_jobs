@@ -1,12 +1,11 @@
 variable "boundary_version" {
   type = string
-  default = "0.13.0+ent"
+  default = "0.18.0+ent"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "f86d4520c279701c88a943a863779d2284514d38b2bfd36f218ab3464fadfa63"
-
+  default = "d02e7c0186c1d2926e9b0cde739c5da8fccc44d582ea1b5c667d33c54b1642af"
 }
 
 
@@ -36,7 +35,7 @@ job "boundary-ingress-worker" {
 
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
+        source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_${attr.kernel.name}_${attr.cpu.arch}.zip"
         destination = "./tmp/"
         options {
           # checksum = "sha256:${var.boundary_checksum}"
@@ -102,7 +101,7 @@ events {
         destination = "./tmp/boundary.d/pki-worker.hcl"
       }
       config {
-        command = "/tmp/boundary-worker"
+        command = "/tmp/boundary"
         args = ["server", "-config=tmp/boundary.d/pki-worker.hcl"]
       }
       service {

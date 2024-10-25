@@ -1,11 +1,11 @@
 variable "boundary_version" {
   type = string
-  default = "0.13.0"
+  default = "0.18.0"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "7c3db27111d8622061b1fc667ab4b1bb0d6af04f8a8ae3e0f6dfd58dfb086d41"
+  default = "d02e7c0186c1d2926e9b0cde739c5da8fccc44d582ea1b5c667d33c54b1642af"
 }
 
 job "boundary-controller" {
@@ -43,7 +43,7 @@ job "boundary-controller" {
         memory = 512
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
+         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_${attr.kernel.name}_${attr.cpu.arch}.zip"
         destination = "./tmp/"
         options {
          # checksum = "sha256:${var.boundary_checksum}"
@@ -154,8 +154,8 @@ TEMPLATEEOF
 
       }
       artifact {
-         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_linux_amd64.zip"
-        destination = "./tmp/"
+         source     = "https://releases.hashicorp.com/boundary/${var.boundary_version}/boundary_${var.boundary_version}_${attr.kernel.name}_${attr.cpu.arch}.zip"
+         destination = "./tmp/"
         options {
        #   checksum = "sha256:${var.boundary_checksum}"
         }

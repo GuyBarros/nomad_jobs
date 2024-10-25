@@ -7,7 +7,7 @@ job "boundary-postgres" {
     count = 1
 
 network {
-        mode = "bridge"
+      #  mode = "bridge"
         port "db" {
           static = 5432
            }
