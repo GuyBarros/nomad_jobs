@@ -6,9 +6,7 @@ job "nginx" {
     count = 5
 
     vault {
-      policies = ["superuser"]
-      # namespace = "admin"
-      env = false
+
     }
  network {
     port "http" {
@@ -23,7 +21,8 @@ job "nginx" {
       driver = "docker"
 
       config {
-        image = "nginx"
+        # image = "nginx"
+        image = "arm64v8/nginx"
          ports = ["http", "https"]
         
         volumes = [
@@ -104,7 +103,11 @@ job "nginx" {
         port = "http"
         tags = [
           "global",
-          "urlprefix-/nginx-pki"
+          "urlprefix-/nginx-pki",
+          "traefik.enable=true",
+          "traefik.http.routers.nginx-pki.rule=PathPrefix(`/nginx-pki`)",
+          "traefik.http.services.nginx-pki.loadbalancer.sticky",
+          "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto = https"
           ]
         check {
           type     = "tcp"
