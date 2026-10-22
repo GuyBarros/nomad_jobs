@@ -1,70 +1,51 @@
 job "guacamole" {
-  datacenters = ["dc1","eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2"]
+  datacenters = ["dc1", "eu-west-2a", "eu-west-2b", "eu-west-2c", "eu-west-2"]
+  type        = "service"
 
-  group "database" {
+  # All tasks share one network namespace (bridge mode), so guacamole talks to
+  # guacd and postgres over 127.0.0.1 without exposing them outside the alloc.
+  group "guacamole" {
     count = 1
 
     network {
-      port "db" {
-        static = 5432
+      mode = "bridge"
+      port "http" {
+        static = 8080
+        to     = 8080
       }
     }
 
     service {
-      name = "postgres"
-      port = "db"
-      tags = ["database"]
+      name = "guacamole"
+      port = "http"
+      tags = ["web", "urlprefix-/guacamole"]
       check {
-        type     = "tcp"
+        type     = "http"
+        path     = "/guacamole/"
         interval = "10s"
         timeout  = "2s"
       }
     }
 
-    task "init-script" {
-      driver = "raw_exec"
-
-      config {
-        command = "/bin/sh"
-        args = ["-c", "echo 'CREATE TABLE guacamole_entity (entity_id serial PRIMARY KEY, name varchar(128) NOT NULL UNIQUE, type varchar(32) NOT NULL); CREATE TABLE guacamole_user (entity_id integer PRIMARY KEY REFERENCES guacamole_entity(entity_id) ON DELETE CASCADE, username varchar(128) NOT NULL UNIQUE, password_hash bytea NOT NULL, password_salt bytea NOT NULL, password_date timestamp NOT NULL, disabled boolean NOT NULL DEFAULT false, expired boolean NOT NULL DEFAULT false, access_window_start time, access_window_end time, valid_from timestamp, valid_until timestamp, timezone varchar(64));' > ./tmp/local/postgres-init/initdb.sql"]
-      }
-
-      template {
-        data = <<EOF
-#!/bin/bash
-echo 'CREATE TABLE guacamole_entity (
-    entity_id serial PRIMARY KEY,
-    name varchar(128) NOT NULL UNIQUE,
-    type varchar(32) NOT NULL
-);
-CREATE TABLE guacamole_user (
-    entity_id integer PRIMARY KEY REFERENCES guacamole_entity(entity_id) ON DELETE CASCADE,
-    username varchar(128) NOT NULL UNIQUE,
-    password_hash bytea NOT NULL,
-    password_salt bytea NOT NULL,
-    password_date timestamp NOT NULL,
-    disabled boolean NOT NULL DEFAULT false,
-    expired boolean NOT NULL DEFAULT false,
-    access_window_start time,
-    access_window_end time,
-    valid_from timestamp,
-    valid_until timestamp,
-    timezone varchar(64)
-);
--- Additional tables and indexes as required by Guacamole
--- Refer to the Guacamole schema documentation for a complete list of tables and indexes' > /local/postgres-init/initdb.sql
-EOF
-
-        destination = "./tmp/local/postgres-init/initdb.sql"
-      }
+    # Generate the full Guacamole PostgreSQL schema using the script shipped in
+    # the guacamole image, and drop it where the postgres task will pick it up.
+    task "init-schema" {
+      driver = "docker"
 
       lifecycle {
-        hook = "prestart"
+        hook    = "prestart"
+        sidecar = false
+      }
+
+      config {
+        image      = "guacamole/guacamole:1.6.0"
+        entrypoint = ["/bin/sh", "-c"]
+        args       = ["mkdir -p /alloc/data/initdb && /opt/guacamole/bin/initdb.sh --postgresql > /alloc/data/initdb/initdb.sql"]
       }
 
       resources {
         cpu    = 100
-        memory = 50
+        memory = 128
       }
     }
 
@@ -72,19 +53,16 @@ EOF
       driver = "docker"
 
       config {
-        image = "postgres:latest"
-        
-        ports = ["db"]
-
-        env = {
-          POSTGRES_DB       = "guacamole_db"
-          POSTGRES_USER     = "guacamole_user"
-          POSTGRES_PASSWORD = "your-secure-password"
-        }
-
+        image = "postgres:16-alpine"
         volumes = [
-          "./tmp/local/postgres-init:/docker-entrypoint-initdb.d"
+          "../alloc/data/initdb:/docker-entrypoint-initdb.d:ro"
         ]
+      }
+
+      env {
+        POSTGRES_DB       = "guacamole_db"
+        POSTGRES_USER     = "guacamole_user"
+        POSTGRES_PASSWORD = "your-secure-password"
       }
 
       resources {
@@ -92,26 +70,17 @@ EOF
         memory = 512
       }
     }
-  }
 
-  group "guacamole" {
-    count = 1
+    task "guacd" {
+      driver = "docker"
 
-    network {
-      port "guacamole" {
-        static = 8080
+      config {
+        image = "guacamole/guacd:1.6.0"
       }
-    }
 
-    service {
-      name = "guacamole"
-      port = "guacamole"
-      tags = ["web"]
-      check {
-        type     = "http"
-        path     = "/"
-        interval = "10s"
-        timeout  = "2s"
+      resources {
+        cpu    = 500
+        memory = 256
       }
     }
 
@@ -119,40 +88,30 @@ EOF
       driver = "docker"
 
       config {
-        image = "guacamole/guacamole:latest"
+        image = "guacamole/guacamole:1.6.0"
+        ports = ["http"]
+      }
 
-        ports = ["guacamole"]
+      env {
+        GUACD_HOSTNAME      = "127.0.0.1"
+        GUACD_PORT          = "4822"
+        POSTGRESQL_HOSTNAME = "127.0.0.1"
+        POSTGRESQL_PORT     = "5432"
+        POSTGRESQL_DATABASE = "guacamole_db"
+        POSTGRESQL_USER     = "guacamole_user"
+        POSTGRESQL_PASSWORD = "your-secure-password"
+      }
 
-        env = {
-          GUACAMOLE_HOME              = "/guacamole"
-          POSTGRES_HOSTNAME           = "postgres.service.consul"
-          POSTGRES_PORT               = "5432"
-          POSTGRES_DATABASE           = "guacamole_db"
-          POSTGRES_USER               = "guacamole_user"
-          POSTGRES_PASSWORD           = "your-secure-password"
-        }
-
-        volumes = [
-          "local/guacamole:/guacamole"
-        ]
+      restart {
+        attempts = 10
+        interval = "5m"
+        delay    = "15s"
+        mode     = "delay"
       }
 
       resources {
         cpu    = 500
-        memory = 256
-      }
-    }
-
-    task "guacd" {
-      driver = "docker"
-
-      config {
-        image = "guacamole/guacd:latest"
-      }
-
-      resources {
-        cpu    = 500
-        memory = 256
+        memory = 512
       }
     }
   }

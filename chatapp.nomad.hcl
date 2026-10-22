@@ -31,7 +31,6 @@ consul{
       env {
         MONGODB_SERVER = "127.0.0.1"
         MONGODB_PORT = "27017"
-        CONSUL_HTTP_TOKEN="11a9a399-3f1d-b431-2a09-5e50e0ea3a02"
       }
       resources {
         cpu = 300 # MHz

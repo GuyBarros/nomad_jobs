@@ -1,16 +1,18 @@
+# nomad run boundary-ent-controller.nomad.hcl -var ent_license="$BOUNDARY_LICENSE"
+
 variable "boundary_version" {
   type = string
-  default = "0.18.0+ent"
+  default = "0.21.1+ent"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "319c91a2137d8ffb9595aa801dedd19f806f868a577010e35b591a45eb13ff39"
+  default = "537ed4916cfe584ccb0243449866a4f8dccd697ce4eb87ee2f9b5a4b21bae72c"
 }
 
 variable "ent_license" {
   type = string
-  default = ""
+  default = "boundary-ent-license-string"
 }
 
 job "boundary-controller" {

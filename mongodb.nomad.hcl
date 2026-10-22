@@ -10,10 +10,10 @@ job "mongodb" {
          consul{
       namespace = var.consul_namespace
     }
-#           volume "mongodb_vol" {
-#      type = "host"
-#        source = "mongodb_mount"
-#    }
+           volume "mongodb_vol" {
+      type = "host"
+        source = "mongodb_mount"
+    }
      network {
                     mode = "bridge"
                     port "db"{
@@ -22,10 +22,10 @@ job "mongodb" {
                 }
     task "mongodb" {
             driver = "docker"
-#            volume_mount {
-#                volume      = "mongodb_vol"
-#                destination = "/data/db"
-#               }
+            volume_mount {
+                volume      = "mongodb_vol"
+                destination = "/data/db"
+               }
             config {
                 image = "mongo"
                 ports = ["db"]
@@ -40,7 +40,6 @@ job "mongodb" {
                 memory = 512
             }
             env{
-             # CONSUL_HTTP_TOKEN="11a9a399-3f1d-b431-2a09-5e50e0ea3a02"
             }
 
         }

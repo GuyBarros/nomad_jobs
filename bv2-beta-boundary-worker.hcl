@@ -10,7 +10,7 @@ variable "boundary_checksum" {
 }
 
 variable "boundary_auth_tokens" {
-  default = "neslat_2KrTaG72coHRjJmR9RsyyESJ9ShxpSRR4c5a3zMPYQACgFcrPGw8Ck5rmh3QuhdxTQp77n83BhBgVMw52FazwAGofiV6p"
+  default = "boundary-auth-token"
 }
 
 variable "boundary_ingress_worker_count"{

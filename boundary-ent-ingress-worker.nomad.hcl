@@ -1,11 +1,11 @@
 variable "boundary_version" {
   type = string
-  default = "0.18.0+ent"
+  default = "1.0.2+ent"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "d02e7c0186c1d2926e9b0cde739c5da8fccc44d582ea1b5c667d33c54b1642af"
+  default = "537ed4916cfe584ccb0243449866a4f8dccd697ce4eb87ee2f9b5a4b21bae72c"
 }
 
 
@@ -53,22 +53,27 @@ job "boundary-ingress-worker" {
 
 
 listener "tcp" {
+  # Should be the IP of the NIC that the worker will connect on
+  address = "{{ env  "attr.unique.network.ip-address" }}:9201"
+  # The purpose of this listener
+  purpose = "cluster"
+  tls_disable = true
+}
+
+listener "tcp" {
   address = "0.0.0.0:9202"
   purpose = "proxy"
      tls_disable = true
 }
  
-
+hcp_boundary_cluster_id = "6f14cf8d-21a9-4421-ab43-562fbfe9fa64"
 
 worker {
   auth_storage_path = "tmp/boundary.d/"
+  recording_storage_path = "tmp/boundary.d/"
   # change this to the public ip address of the specific platform you are running or use "attr.unique.network.ip-address"
    public_addr = "{{ env "attr.unique.platform.aws.public-ipv4" }}"
-   initial_upstreams = [
-     {{ range service "boundary-controller" }}
-        "{{ .Address }}:9201",
-     {{ end }}
-  ]
+
      tags {
     type      = ["workers","ent","demostack","ingress","ingress-{{ env "node.unique.name" }}"]
   }

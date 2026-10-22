@@ -5,7 +5,7 @@ variable "vault_addr" {
 
 variable "vault_token" {
  type = string
- default = "hvs.CAESIJojyfgh7nRKePkk7azU4pm2jhBUkE-eUw6a8NjxpvtcGicKImh2cy5Sd2dlZ29FSGNkUzZ0aHdXa1YzUUJwYTcuZE1la0gQzRQ"
+ default = "vault-token"
  }
 
 variable "vault_namespace" {

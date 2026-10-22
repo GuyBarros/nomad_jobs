@@ -23,7 +23,8 @@ job "presentation" {
     task "hashibo" {
       driver = "docker"
       config {
-        image = "guybarros/hashibo:akamai_202310"
+       #image = "guybarros/hashibo:akamai_202310"
+        image = "boeroboy/hashibo:svgbase"
         ports = ["http"]
       }
 

@@ -1,11 +1,12 @@
+
 variable "boundary_version" {
   type = string
-  default = "0.18.0+ent"
+  default = "0.21.1+ent"
 }
 
 variable "boundary_checksum" {
   type = string
-  default = "d02e7c0186c1d2926e9b0cde739c5da8fccc44d582ea1b5c667d33c54b1642af"
+  default = "537ed4916cfe584ccb0243449866a4f8dccd697ce4eb87ee2f9b5a4b21bae72c"
 }
 
 
@@ -66,6 +67,7 @@ listener "tcp" {
 
 worker {
   auth_storage_path = "tmp/boundary.d/"
+  recording_storage_path = "tmp/boundary.d/"
   # change this to the public ip address of the specific platform you are running or use "attr.unique.network.ip-address"
   # initial_upstreams = ["10.1.2.86:9202","10.1.2.148:9202"]
   initial_upstreams = [

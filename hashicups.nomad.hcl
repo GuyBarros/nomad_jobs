@@ -1,7 +1,7 @@
 variable "datacenters" {
   description = "A list of datacenters in the region which are eligible for task placement."
   type        = list(string)
-  default     = ["eu-west"]
+  default     = ["*"]
 }
 
 variable "region" {
@@ -12,27 +12,27 @@ variable "region" {
 
 variable "frontend_version" {
   description = "Docker version tag"
-  default = "v1.0.9"
+  default = "v1.0.3"
 }
 
 variable "public_api_version" {
   description = "Docker version tag"
-  default = "v0.0.7"
+  default = "v0.0.6"
 }
 
 variable "payments_version" {
   description = "Docker version tag"
-  default = "v0.0.16"
+  default = "v0.0.12"
 }
 
 variable "product_api_version" {
   description = "Docker version tag"
-  default = "v0.0.22"
+  default = "v0.0.20"
 }
 
 variable "product_api_db_version" {
   description = "Docker version tag"
-  default = "v0.0.22"
+  default = "v0.0.20"
 }
 
 variable "postgres_db" {
@@ -72,7 +72,7 @@ variable "public_api_port" {
 
 variable "nginx_port" {
   description = "Nginx Port"
-  default = 8045
+  default = 80
 }
 
 # Begin Job Spec
@@ -129,7 +129,6 @@ job "hashicups" {
         image   = "hashicorpdemoapp/product-api:${var.product_api_version}"
         ports = ["product-api"]
       }
-      
       env {
         DB_CONNECTION = "host=${NOMAD_IP_db} port=${NOMAD_PORT_db} user=${var.postgres_user} password=${var.postgres_password} dbname=${var.postgres_db} sslmode=disable"
         BIND_ADDRESS = "0.0.0.0:${NOMAD_PORT_product-api}"
@@ -138,10 +137,6 @@ job "hashicups" {
 
     task "payments-api" {
       driver = "docker"
-      resources {
-       # cpu = 300 # MHz
-         memory = 512 # MB
-      }
       meta {
         service = "payments-api"
       }
@@ -153,7 +148,6 @@ job "hashicups" {
           source = "local/application.properties"
           target = "/application.properties"
         }
-        
       }
       template {
         data = "server.port=${var.payments_api_port}"
@@ -170,7 +164,6 @@ job "hashicups" {
         image   = "hashicorpdemoapp/public-api:${var.public_api_version}"
         ports = ["public-api"]
       }
-      
       env {
         BIND_ADDRESS = ":${NOMAD_PORT_public-api}"
         PRODUCT_API_URI = "http://${NOMAD_ADDR_product-api}"
@@ -196,7 +189,7 @@ job "hashicups" {
     task "nginx" {
       driver = "docker"
       meta {
-        service = "hashicorpdemoapp/frontend-nginx:${var.frontend_version}"
+        service = "nginx-reverse-proxy"
       }
       config {
         image = "nginx:alpine"

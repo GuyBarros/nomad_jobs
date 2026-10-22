@@ -12,6 +12,16 @@ job "nginx" {
     vault {
 
     }
+
+    # This Vault deployment doesn't expose its version on the unauthenticated
+    # health endpoint, so Nomad's default vault.version fingerprint is never
+    # set on any client. Override the implicit "semver >= 0.6.1" placement
+    # constraint Nomad adds for jobs with a vault{} stanza.
+    constraint {
+      attribute = "${attr.vault.version}"
+      operator  = "is_not_set"
+    }
+
  network {
     port "http" {
         to = 80
@@ -47,8 +57,15 @@ job "nginx" {
             ssl_certificate /etc/nginx/ssl/nginx.key;
             ssl_certificate_key /etc/nginx/ssl/nginx.key;
 
+            # Direct access (no path prefix)
             location / {
               root /local/data/;
+            }
+
+            # Traefik may forward the full path including the strip-prefix.
+            # Handle both forwarded and non-forwarded forms.
+            location /nginx-pki/ {
+              alias /local/data/nginx-pki/;
             }
           }
         EOH
@@ -152,6 +169,13 @@ template {
             var s=Math.floor(ms/1000), m=Math.floor(s/60), h=Math.floor(m/60);
             return h>0 ? h+'h '+(m%60)+'m' : m+'m '+(s%60)+'s';
           }
+          // Reload at 95 % of TTL elapsed so the browser always shows a fresh cert.
+          // This fires before expiry regardless of whether the page is accessed
+          // directly or via Traefik (window.location.reload() uses the current URL).
+          var reloadAt = (issuedTs + (expiryTs - issuedTs) * 0.95) * 1000;
+          var msUntilReload = Math.max(0, reloadAt - Date.now());
+          setTimeout(function(){ window.location.reload(); }, msUntilReload);
+
           function update() {
             var now=Math.floor(Date.now()/1000);
             var total=expiryTs-issuedTs, elapsed=now-issuedTs;
@@ -163,7 +187,7 @@ template {
             document.getElementById('pct-label').textContent=pct+'% elapsed';
             document.getElementById('progress-bar').style.width=pct+'%';
             var bar=document.getElementById('progress-bar'), pill=document.getElementById('cert-status');
-            if(remaining<=0){bar.style.background='#ef4444';pill.style.background='#2a1c1c';pill.style.color='#f87171';pill.textContent='expired';}
+            if(remaining<=0){bar.style.background='#ef4444';pill.style.background='#2a1c1c';pill.style.color='#f87171';pill.textContent='expired';window.location.reload();}
             else if(pct>=80){bar.style.background='#f59e0b';pill.style.background='#2a2010';pill.style.color='#fbbf24';pill.textContent='expiring soon';}
             else{bar.style.background='#22c55e';pill.style.background='#1c2a1c';pill.style.color='#4ade80';pill.textContent='valid';}
           }
